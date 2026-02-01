@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Events - Admin Dashboard</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+    <link rel="stylesheet" href="/src/admin/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <img src="/images/logo.png" alt="Logo" height="40">
+                <h3>AYF Admin</h3>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="/admin/dashboard.html" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/manage-events.html" class="nav-item active">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Manage Events</span>
+                </a>
+                <a href="/admin/manage-gallery.html" class="nav-item">
+                    <i class="fas fa-images"></i>
+                    <span>Manage Gallery</span>
+                </a>
+                <a href="/admin/manage-plans.html" class="nav-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>Yearly Plans</span>
+                </a>
+                <a href="/admin/manage-announcements.html" class="nav-item">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Announcements</span>
+                </a>
+                <a href="/admin/manage-users.html" class="nav-item">
+                    <i class="fas fa-users-cog"></i>
+                    <span>Manage Users</span>
+                </a>
+                <a href="/" class="nav-item">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span>View Site</span>
+                </a>
+                <button id="logout-btn" class="nav-item logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </nav>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>Manage Events</h1>
+                <button id="add-event-btn" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add New Event
+                </button>
+            </header>
+
+            <div class="admin-content">
+                <div class="content-header">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="event-search" placeholder="Search events...">
+                    </div>
+                    
+                    <div class="filter-options">
+                        <select id="event-filter" class="form-control">
+                            <option value="all">All Events</option>
+                            <option value="upcoming">Upcoming</option>
+                            <option value="past">Past Events</option>
+                            <option value="this-month">This Month</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Location</th>
+                                <th>RSVPs</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="events-table-body">
+                            <!-- Events loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="loading" class="text-center">
+                    <div class="loading"></div>
+                    <p>Loading events...</p>
+                </div>
+
+                <div id="no-events" class="text-center" style="display: none;">
+                    <i class="fas fa-calendar-times fa-3x mb-3" style="color: var(--light-blue);"></i>
+                    <h3>No events found</h3>
+                    <p>Click "Add New Event" to create your first event</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Event Form Modal -->
+    <div id="event-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <h2 id="modal-title">Add New Event</h2>
+            
+            <form id="event-form" class="admin-form">
+                <div class="form-group">
+                    <label for="event-title">Event Title *</label>
+                    <input type="text" id="event-title" name="title" required class="form-control" placeholder="Enter event title">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="event-date">Date *</label>
+                        <input type="date" id="event-date" name="date" required class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="event-time">Time *</label>
+                        <input type="time" id="event-time" name="time" required class="form-control">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-location">Location *</label>
+                    <input type="text" id="event-location" name="location" required class="form-control" placeholder="Enter event location">
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-description">Description *</label>
+                    <textarea id="event-description" name="description" rows="4" required class="form-control" placeholder="Describe the event"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-image">Image URL</label>
+                    <input type="url" id="event-image" name="image_url" class="form-control" placeholder="https://example.com/image.jpg">
+                    <small class="form-text">Optional. You can also upload images in the Gallery section.</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-rsvp">RSVP Link</label>
+                    <input type="url" id="event-rsvp" name="rsvp_link" class="form-control" placeholder="https://example.com/rsvp">
+                    <small class="form-text">Optional. Link to RSVP form or page</small>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span id="submit-text">Create Event</span>
+                        <div class="spinner" style="display: none;"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div id="delete-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>Confirm Delete</h3>
+            <p>Are you sure you want to delete this event? This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary close-delete-modal">Cancel</button>
+                <button type="button" id="confirm-delete" class="btn btn-primary">Delete Event</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { authManager } from '/src/supabase/auth.js'
+        import { eventsManager } from '/src/supabase/events.js'
+
+        class ManageEvents {
+            constructor() {
+                this.events = []
+                this.currentEventId = null
+                this.isEditing = false
+                this.init()
+            }
+
+            async init() {
+                // Check authentication
+                const user = authManager.getUser()
+                if (!user || !authManager.isAdmin()) {
+                    window.location.href = '/admin/login.html'
+                    return
+                }
+
+                this.setupEventListeners()
+                await this.loadEvents()
+                this.setupLogout()
+            }
+
+            async loadEvents() {
+                try {
+                    this.events = await eventsManager.getAllEvents()
+                    const pastEvents = await eventsManager.getPastEvents()
+                    this.events = [...this.events, ...pastEvents]
+                    
+                    this.renderEventsTable()
+                    document.getElementById('loading').style.display = 'none'
+                    
+                    if (this.events.length === 0) {
+                        document.getElementById('no-events').style.display = 'block'
+                    }
+                } catch (error) {
+                    console.error('Error loading events:', error)
+                    this.showNotification('Failed to load events', 'error')
+                }
+            }
+
+            renderEventsTable(filteredEvents = this.events) {
+                const tbody = document.getElementById('events-table-body')
+                
+                if (filteredEvents.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="text-center">No events found</td>
+                        </tr>
+                    `
+                    return
+                }
+
+                tbody.innerHTML = filteredEvents.map(event => {
+                    const eventDate = new Date(event.date)
+                    const now = new Date()
+                    const isUpcoming = eventDate >= now
+                    const rsvpCount = 0 // In real implementation, fetch from RSVPs table
+                    
+                    return `
+                        <tr>
+                            <td>
+                                <strong>${event.title}</strong>
+                                <br>
+                                <small>${event.description.substring(0, 50)}...</small>
+                            </td>
+                            <td>${eventDate.toLocaleDateString()}</td>
+                            <td>${event.time || 'TBD'}</td>
+                            <td>${event.location || 'TBD'}</td>
+                            <td>${rsvpCount}</td>
+                            <td>
+                                <span class="status-badge ${isUpcoming ? 'upcoming' : 'past'}">
+                                    ${isUpcoming ? 'Upcoming' : 'Past'}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="table-action-btn edit" data-id="${event.id}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="table-action-btn delete" data-id="${event.id}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `
+                }).join('')
+
+                // Add event listeners to action buttons
+                this.setupTableActions()
+            }
+
+            setupEventListeners() {
+                // Add Event button
+                document.getElementById('add-event-btn').addEventListener('click', () => {
+                    this.openEventForm()
+                })
+
+                // Search input
+                document.getElementById('event-search').addEventListener('input', (e) => {
+                    this.filterEvents(e.target.value)
+                })
+
+                // Filter select
+                document.getElementById('event-filter').addEventListener('change', (e) => {
+                    this.filterByStatus(e.target.value)
+                })
+
+                // Modal close buttons
+                document.querySelectorAll('.close-modal').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        this.closeEventModal()
+                    })
+                })
+
+                // Close delete modal
+                document.querySelector('.close-delete-modal').addEventListener('click', () => {
+                    this.closeDeleteModal()
+                })
+
+                // Event form submission
+                document.getElementById('event-form').addEventListener('submit', (e) => {
+                    e.preventDefault()
+                    this.saveEvent()
+                })
+
+                // Confirm delete
+                document.getElementById('confirm-delete').addEventListener('click', () => {
+                    this.deleteEvent()
+                })
+            }
+
+            setupTableActions() {
+                // Edit buttons
+                document.querySelectorAll('.table-action-btn.edit').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const eventId = btn.dataset.id
+                        this.editEvent(eventId)
+                    })
+                })
+
+                // Delete buttons
+                document.querySelectorAll('.table-action-btn.delete').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const eventId = btn.dataset.id
+                        this.confirmDelete(eventId)
+                    })
+                })
+            }
+
+            openEventForm(event = null) {
+                this.isEditing = !!event
+                this.currentEventId = event?.id || null
+                
+                const modal = document.getElementById('event-modal')
+                const form = document.getElementById('event-form')
+                const title = document.getElementById('modal-title')
+                const submitText = document.getElementById('submit-text')
+                
+                if (event) {
+                    title.textContent = 'Edit Event'
+                    submitText.textContent = 'Update Event'
+                    
+                    // Fill form with event data
+                    form.title.value = event.title
+                    form.date.value = event.date
+                    form.time.value = event.time || ''
+                    form.location.value = event.location || ''
+                    form.description.value = event.description || ''
+                    form.image_url.value = event.image_url || ''
+                    form.rsvp_link.value = event.rsvp_link || ''
+                } else {
+                    title.textContent = 'Add New Event'
+                    submitText.textContent = 'Create Event'
+                    form.reset()
+                    
+                    // Set default date to tomorrow
+                    const tomorrow = new Date()
+                    tomorrow.setDate(tomorrow.getDate() + 1)
+                    form.date.value = tomorrow.toISOString().split('T')[0]
+                }
+                
+                modal.style.display = 'flex'
+            }
+
+            closeEventModal() {
+                const modal = document.getElementById('event-modal')
+                modal.style.display = 'none'
+                this.currentEventId = null
+                this.isEditing = false
+            }
+
+            async saveEvent() {
+                const form = document.getElementById('event-form')
+                const submitBtn = form.querySelector('button[type="submit"]')
+                const submitText = submitBtn.querySelector('#submit-text')
+                const spinner = submitBtn.querySelector('.spinner')
+                
+                // Show loading state
+                submitText.style.display = 'none'
+                spinner.style.display = 'block'
+                submitBtn.disabled = true
+
+                try {
+                    const eventData = {
+                        title: form.title.value,
+                        date: form.date.value,
+                        time: form.time.value,
+                        location: form.location.value,
+                        description: form.description.value,
+                        image_url: form.image_url.value || null,
+                        rsvp_link: form.rsvp_link.value || null,
+                        created_by: authManager.getUser().id
+                    }
+
+                    if (this.isEditing && this.currentEventId) {
+                        await eventsManager.updateEvent(this.currentEventId, eventData)
+                        this.showNotification('Event updated successfully!', 'success')
+                    } else {
+                        await eventsManager.createEvent(eventData)
+                        this.showNotification('Event created successfully!', 'success')
+                    }
+
+                    // Reload events
+                    await this.loadEvents()
+                    
+                    // Close modal
+                    this.closeEventModal()
+                } catch (error) {
+                    console.error('Error saving event:', error)
+                    this.showNotification('Failed to save event', 'error')
+                } finally {
+                    // Reset button state
+                    submitText.style.display = 'inline'
+                    spinner.style.display = 'none'
+                    submitBtn.disabled = false
+                }
+            }
+
+            editEvent(eventId) {
+                const event = this.events.find(e => e.id === eventId)
+                if (event) {
+                    this.openEventForm(event)
+                }
+            }
+
+            confirmDelete(eventId) {
+                this.currentEventId = eventId
+                const modal = document.getElementById('delete-modal')
+                modal.style.display = 'flex'
+            }
+
+            closeDeleteModal() {
+                const modal = document.getElementById('delete-modal')
+                modal.style.display = 'none'
+                this.currentEventId = null
+            }
+
+            async deleteEvent() {
+                try {
+                    await eventsManager.deleteEvent(this.currentEventId)
+                    this.showNotification('Event deleted successfully!', 'success')
+                    
+                    // Reload events
+                    await this.loadEvents()
+                    
+                    // Close modal
+                    this.closeDeleteModal()
+                } catch (error) {
+                    console.error('Error deleting event:', error)
+                    this.showNotification('Failed to delete event', 'error')
+                }
+            }
+
+            filterEvents(searchTerm) {
+                const filtered = this.events.filter(event => 
+                    event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    event.location.toLowerCase().includes(searchTerm.toLowerCase())
+                )
+                this.renderEventsTable(filtered)
+            }
+
+            filterByStatus(status) {
+                const now = new Date()
+                let filtered = this.events
+                
+                switch(status) {
+                    case 'upcoming':
+                        filtered = this.events.filter(event => new Date(event.date) >= now)
+                        break
+                    case 'past':
+                        filtered = this.events.filter(event => new Date(event.date) < now)
+                        break
+                    case 'this-month':
+                        const currentMonth = now.getMonth()
+                        const currentYear = now.getFullYear()
+                        filtered = this.events.filter(event => {
+                            const eventDate = new Date(event.date)
+                            return eventDate.getMonth() === currentMonth && 
+                                   eventDate.getFullYear() === currentYear
+                        })
+                        break
+                }
+                
+                this.renderEventsTable(filtered)
+            }
+
+            showNotification(message, type) {
+                const notification = document.createElement('div')
+                notification.className = `notification ${type}`
+                notification.textContent = message
+                document.body.appendChild(notification)
+                
+                setTimeout(() => notification.classList.add('show'), 100)
+                
+                setTimeout(() => {
+                    notification.classList.remove('show')
+                    setTimeout(() => notification.remove(), 300)
+                }, 5000)
+            }
+
+            setupLogout() {
+                document.getElementById('logout-btn').addEventListener('click', async () => {
+                    await authManager.signOut()
+                    window.location.href = '/admin/login.html'
+                })
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new ManageEvents()
+        })
+    </script>
+
+    <style>
+        .admin-content {
+            padding: 2rem;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+        }
+        
+        .search-box {
+            flex: 1;
+            max-width: 400px;
+            position: relative;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--dark-gray);
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            border: 2px solid #e1e5eb;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .filter-options {
+            min-width: 200px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-badge.upcoming {
+            background: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+        }
+        
+        .status-badge.past {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .table-action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid #e1e5eb;
+            background: var(--white);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .table-action-btn:hover {
+            background: #f8fafc;
+        }
+        
+        .table-action-btn.edit:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+        
+        .table-action-btn.delete:hover {
+            border-color: var(--light-red);
+            color: var(--light-red);
+        }
+        
+        #event-modal .modal-content {
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .form-text {
+            display: block;
+            margin-top: 0.25rem;
+            font-size: 0.875rem;
+            color: var(--dark-gray);
+        }
+        
+        #delete-modal .modal-content {
+            max-width: 400px;
+            padding: 2rem;
+        }
+        
+        #delete-modal h3 {
+            color: var(--dark-blue);
+            margin-bottom: 0.5rem;
+        }
+        
+        #delete-modal > p {
+            color: var(--dark-gray);
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+        
+        @media (max-width: 768px) {
+            .content-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                max-width: none;
+            }
+            
+            .filter-options {
+                min-width: auto;
+            }
+        }
+    </style>
+</body>
+</html>
