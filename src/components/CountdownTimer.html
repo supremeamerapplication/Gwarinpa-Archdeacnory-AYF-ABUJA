@@ -1,0 +1,292 @@
+<div class="countdown-timer">
+    <div class="countdown-header">
+        <h3>Next Major Event</h3>
+        <h4 class="event-title">Loading...</h4>
+    </div>
+    
+    <div class="countdown-display">
+        <div class="countdown-item">
+            <span class="countdown-value" id="days">00</span>
+            <span class="countdown-label">Days</span>
+        </div>
+        <div class="countdown-item">
+            <span class="countdown-value" id="hours">00</span>
+            <span class="countdown-label">Hours</span>
+        </div>
+        <div class="countdown-item">
+            <span class="countdown-value" id="minutes">00</span>
+            <span class="countdown-label">Minutes</span>
+        </div>
+        <div class="countdown-item">
+            <span class="countdown-value" id="seconds">00</span>
+            <span class="countdown-label">Seconds</span>
+        </div>
+    </div>
+    
+    <div class="countdown-footer">
+        <p class="event-date">Date: Loading...</p>
+        <a href="#" class="btn btn-primary rsvp-link" style="display: none;">RSVP Now</a>
+    </div>
+</div>
+
+<style>
+    .countdown-timer {
+        background: linear-gradient(135deg, var(--dark-blue), #0f1a2f);
+        color: var(--white);
+        border-radius: 16px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: var(--shadow-lg);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .countdown-header {
+        margin-bottom: 2rem;
+    }
+    
+    .countdown-header h3 {
+        color: var(--gold);
+        margin-bottom: 0.5rem;
+        font-size: 1.5rem;
+    }
+    
+    .countdown-header h4 {
+        margin: 0;
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+    
+    .countdown-display {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .countdown-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 80px;
+    }
+    
+    .countdown-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        line-height: 1;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0.75rem;
+        border-radius: 12px;
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.5rem;
+        font-family: 'Courier New', monospace;
+    }
+    
+    .countdown-label {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .countdown-footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .event-date {
+        margin: 0;
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+    
+    @media (max-width: 768px) {
+        .countdown-display {
+            gap: 1rem;
+        }
+        
+        .countdown-item {
+            min-width: 70px;
+        }
+        
+        .countdown-value {
+            width: 70px;
+            height: 70px;
+            font-size: 2rem;
+        }
+        
+        .countdown-footer {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .countdown-display {
+            flex-wrap: wrap;
+        }
+        
+        .countdown-item {
+            min-width: 60px;
+        }
+        
+        .countdown-value {
+            width: 60px;
+            height: 60px;
+            font-size: 1.75rem;
+        }
+        
+        .countdown-timer {
+            padding: 1.5rem;
+        }
+    }
+</style>
+
+<script>
+    class CountdownTimer extends HTMLElement {
+        constructor() {
+            super()
+            this.nextEvent = null
+            this.countdownInterval = null
+        }
+    
+        connectedCallback() {
+            this.loadNextEvent()
+        }
+    
+        disconnectedCallback() {
+            if (this.countdownInterval) {
+                clearInterval(this.countdownInterval)
+            }
+        }
+    
+        async loadNextEvent() {
+            try {
+                // In a real implementation, you would fetch from your events API
+                // For now, we'll use a simulated event
+                const nextEvent = {
+                    title: "Youth Week 2024 Grand Finale",
+                    date: "2024-03-24T19:00:00",
+                    rsvpLink: "/events.html#rsvp",
+                    location: "Main Auditorium"
+                }
+                
+                this.nextEvent = nextEvent
+                this.updateEventInfo()
+                this.startCountdown()
+            } catch (error) {
+                console.error('Error loading next event:', error)
+                this.showError()
+            }
+        }
+    
+        updateEventInfo() {
+            const eventDate = new Date(this.nextEvent.date)
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
+            
+            this.querySelector('.event-title').textContent = this.nextEvent.title
+            this.querySelector('.event-date').textContent = `Date: ${eventDate.toLocaleDateString('en-US', options)} • ${eventDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+            
+            const rsvpLink = this.querySelector('.rsvp-link')
+            if (this.nextEvent.rsvpLink) {
+                rsvpLink.href = this.nextEvent.rsvpLink
+                rsvpLink.style.display = 'inline-block'
+            }
+        }
+    
+        startCountdown() {
+            const eventDate = new Date(this.nextEvent.date).getTime()
+            
+            this.updateCountdown(eventDate)
+            
+            this.countdownInterval = setInterval(() => {
+                this.updateCountdown(eventDate)
+            }, 1000)
+        }
+    
+        updateCountdown(eventDate) {
+            const now = new Date().getTime()
+            const distance = eventDate - now
+            
+            if (distance < 0) {
+                this.querySelector('.countdown-value#days').textContent = '00'
+                this.querySelector('.countdown-value#hours').textContent = '00'
+                this.querySelector('.countdown-value#minutes').textContent = '00'
+                this.querySelector('.countdown-value#seconds').textContent = '00'
+                
+                this.querySelector('.event-title').textContent = 'Event in progress!'
+                clearInterval(this.countdownInterval)
+                return
+            }
+            
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24))
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000)
+            
+            this.querySelector('.countdown-value#days').textContent = this.padNumber(days)
+            this.querySelector('.countdown-value#hours').textContent = this.padNumber(hours)
+            this.querySelector('.countdown-value#minutes').textContent = this.padNumber(minutes)
+            this.querySelector('.countdown-value#seconds').textContent = this.padNumber(seconds)
+            
+            // Add animation
+            if (seconds === 59) {
+                this.animateNumber('seconds')
+            }
+            if (minutes === 59 && seconds === 59) {
+                this.animateNumber('minutes')
+            }
+            if (hours === 23 && minutes === 59 && seconds === 59) {
+                this.animateNumber('hours')
+            }
+            if (days > 0 && hours === 23 && minutes === 59 && seconds === 59) {
+                this.animateNumber('days')
+            }
+        }
+    
+        padNumber(num) {
+            return num.toString().padStart(2, '0')
+        }
+    
+        animateNumber(elementId) {
+            const element = this.querySelector(`#${elementId}`)
+            element.classList.add('animate')
+            setTimeout(() => {
+                element.classList.remove('animate')
+            }, 500)
+        }
+    
+        showError() {
+            this.querySelector('.event-title').textContent = 'No upcoming events'
+            this.querySelector('.event-date').textContent = 'Check back soon for updates!'
+        }
+    }
+    
+    customElements.define('countdown-timer', CountdownTimer)
+    
+    // Add animation styles
+    const style = document.createElement('style')
+    style.textContent = `
+        .countdown-value.animate {
+            animation: pulse 0.5s ease;
+            background: rgba(244, 162, 97, 0.2);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    `
+    document.head.appendChild(style)
+</script>
