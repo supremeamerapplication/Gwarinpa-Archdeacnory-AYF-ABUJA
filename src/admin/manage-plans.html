@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Yearly Plans - Admin Dashboard</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+    <link rel="stylesheet" href="/src/admin/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <img src="/images/logo.png" alt="Logo" height="40">
+                <h3>AYF Admin</h3>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="/admin/dashboard.html" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/manage-events.html" class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Manage Events</span>
+                </a>
+                <a href="/admin/manage-gallery.html" class="nav-item">
+                    <i class="fas fa-images"></i>
+                    <span>Manage Gallery</span>
+                </a>
+                <a href="/admin/manage-plans.html" class="nav-item active">
+                    <i class="fas fa-calendar"></i>
+                    <span>Yearly Plans</span>
+                </a>
+                <a href="/admin/manage-announcements.html" class="nav-item">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Announcements</span>
+                </a>
+                <a href="/admin/manage-users.html" class="nav-item">
+                    <i class="fas fa-users-cog"></i>
+                    <span>Manage Users</span>
+                </a>
+                <a href="/" class="nav-item">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span>View Site</span>
+                </a>
+                <button id="logout-btn" class="nav-item logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </nav>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>Yearly Plans</h1>
+                <div class="header-actions">
+                    <select id="year-select" class="form-control" style="width: auto;">
+                        <option value="2024">2024</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                    </select>
+                    <button id="add-plan-btn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Monthly Plan
+                    </button>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <div class="plans-container" id="plans-container">
+                    <!-- Plans loaded dynamically -->
+                </div>
+
+                <div id="loading" class="text-center">
+                    <div class="loading"></div>
+                    <p>Loading yearly plans...</p>
+                </div>
+
+                <div id="no-plans" class="text-center" style="display: none;">
+                    <i class="fas fa-calendar-times fa-3x mb-3" style="color: var(--light-blue);"></i>
+                    <h3>No plans found for this year</h3>
+                    <p>Click "Add Monthly Plan" to create your first plan</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Plan Form Modal -->
+    <div id="plan-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <h2 id="modal-title">Add Monthly Plan</h2>
+            
+            <form id="plan-form" class="admin-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="plan-month">Month *</label>
+                        <select id="plan-month" name="month" required class="form-control">
+                            <option value="">Select Month</option>
+                            <option value="January">January</option>
+                            <option value="February">February</option>
+                            <option value="March">March</option>
+                            <option value="April">April</option>
+                            <option value="May">May</option>
+                            <option value="June">June</option>
+                            <option value="July">July</option>
+                            <option value="August">August</option>
+                            <option value="September">September</option>
+                            <option value="October">October</option>
+                            <option value="November">November</option>
+                            <option value="December">December</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="plan-year">Year *</label>
+                        <input type="number" id="plan-year" name="year" required class="form-control" min="2024" max="2030" value="2024">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="plan-theme">Theme</label>
+                    <input type="text" id="plan-theme" name="theme" class="form-control" placeholder="Monthly theme (optional)">
+                </div>
+                
+                <div class="form-group">
+                    <label for="plan-activities">Key Activities (one per line) *</label>
+                    <textarea id="plan-activities" name="activities" rows="4" required class="form-control" placeholder="Enter each activity on a new line"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="plan-scriptures">Focus Scriptures (one per line)</label>
+                    <textarea id="plan-scriptures" name="scriptures" rows="3" class="form-control" placeholder="Enter each scripture on a new line"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="plan-goals">Goals & Objectives (one per line)</label>
+                    <textarea id="plan-goals" name="goals" rows="3" class="form-control" placeholder="Enter each goal on a new line"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="plan-file">Upload Plan Document (Optional)</label>
+                    <input type="file" id="plan-file" name="file" class="form-control" accept=".pdf,.doc,.docx,.xlsx">
+                    <small class="form-text">Upload detailed plan document (PDF, Word, or Excel)</small>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span id="submit-text">Save Plan</span>
+                        <div class="spinner" style="display: none;"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Plan Modal -->
+    <div id="view-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <button class="close-view-modal">&times;</button>
+            <div id="view-content">
+                <!-- Plan details loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { authManager } from '/src/supabase/auth.js'
+        import { plansManager } from '/src/supabase/plans.js'
+
+        class ManagePlans {
+            constructor() {
+                this.plans = []
+                this.currentPlanId = null
+                this.isEditing = false
+                this.currentYear = new Date().getFullYear()
+                this.init()
+            }
+
+            async init() {
+                // Check authentication
+                const user = authManager.getUser()
+                if (!user || !authManager.isAdmin()) {
+                    window.location.href = '/admin/login.html'
+                    return
+                }
+
+                this.setupEventListeners()
+                await this.loadPlans(this.currentYear)
+                this.setupLogout()
+            }
+
+            async loadPlans(year) {
+                try {
+                    this.plans = await plansManager.getYearlyPlan(year)
+                    this.renderPlans()
+                    document.getElementById('loading').style.display = 'none'
+                    
+                    if (this.plans.length === 0) {
+                        document.getElementById('no-plans').style.display = 'block'
+                    } else {
+                        document.getElementById('no-plans').style.display = 'none'
+                    }
+                } catch (error) {
+                    console.error('Error loading plans:', error)
+                    this.showNotification('Failed to load plans', 'error')
+                }
+            }
+
+            renderPlans() {
+                const container = document.getElementById('plans-container')
+                
+                if (this.plans.length === 0) {
+                    container.innerHTML = ''
+                    return
+                }
+
+                container.innerHTML = this.plans.map(plan => `
+                    <div class="plan-card" data-id="${plan.id}">
+                        <div class="plan-card-header">
+                            <h3>${plan.month}</h3>
+                            <span class="year-badge">${plan.year}</span>
+                        </div>
+                        
+                        <div class="plan-card-content">
+                            ${plan.theme ? `
+                                <div class="plan-theme">
+                                    <strong>Theme:</strong> ${plan.theme}
+                                </div>
+                            ` : ''}
+                            
+                            <div class="plan-summary">
+                                <div class="summary-item">
+                                    <i class="fas fa-tasks"></i>
+                                    <span>${JSON.parse(plan.activities || '[]').length} Activities</span>
+                                </div>
+                                <div class="summary-item">
+                                    <i class="fas fa-bible"></i>
+                                    <span>${JSON.parse(plan.scriptures || '[]').length} Scriptures</span>
+                                </div>
+                                <div class="summary-item">
+                                    <i class="fas fa-bullseye"></i>
+                                    <span>${JSON.parse(plan.goals || '[]').length} Goals</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="plan-card-actions">
+                            <button class="btn btn-sm btn-outline view-plan">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="btn btn-sm btn-outline edit-plan">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                        </div>
+                    </div>
+                `).join('')
+
+                // Add event listeners to buttons
+                this.setupPlanActions()
+            }
+
+            setupEventListeners() {
+                // Year select
+                document.getElementById('year-select').addEventListener('change', (e) => {
+                    this.currentYear = parseInt(e.target.value)
+                    this.loadPlans(this.currentYear)
+                })
+
+                // Add Plan button
+                document.getElementById('add-plan-btn').addEventListener('click', () => {
+                    this.openPlanForm()
+                })
+
+                // Modal close buttons
+                document.querySelectorAll('.close-modal').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        this.closePlanModal()
+                    })
+                })
+
+                document.querySelector('.close-view-modal').addEventListener('click', () => {
+                    this.closeViewModal()
+                })
+
+                // Plan form submission
+                document.getElementById('plan-form').addEventListener('submit', (e) => {
+                    e.preventDefault()
+                    this.savePlan()
+                })
+            }
+
+            setupPlanActions() {
+                // View buttons
+                document.querySelectorAll('.view-plan').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const planCard = btn.closest('.plan-card')
+                        const planId = planCard.dataset.id
+                        this.viewPlan(planId)
+                    })
+                })
+
+                // Edit buttons
+                document.querySelectorAll('.edit-plan').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const planCard = btn.closest('.plan-card')
+                        const planId = planCard.dataset.id
+                        this.editPlan(planId)
+                    })
+                })
+            }
+
+            openPlanForm(plan = null) {
+                this.isEditing = !!plan
+                this.currentPlanId = plan?.id || null
+                
+                const modal = document.getElementById('plan-modal')
+                const form = document.getElementById('plan-form')
+                const title = document.getElementById('modal-title')
+                const submitText = document.getElementById('submit-text')
+                
+                if (plan) {
+                    title.textContent = 'Edit Monthly Plan'
+                    submitText.textContent = 'Update Plan'
+                    
+                    // Fill form with plan data
+                    form.month.value = plan.month
+                    form.year.value = plan.year
+                    form.theme.value = plan.theme || ''
+                    form.activities.value = JSON.parse(plan.activities || '[]').join('\n')
+                    form.scriptures.value = JSON.parse(plan.scriptures || '[]').join('\n')
+                    form.goals.value = JSON.parse(plan.goals || '[]').join('\n')
+                } else {
+                    title.textContent = 'Add Monthly Plan'
+                    submitText.textContent = 'Save Plan'
+                    form.reset()
+                    form.year.value = this.currentYear
+                }
+                
+                modal.style.display = 'flex'
+            }
+
+            closePlanModal() {
+                const modal = document.getElementById('plan-modal')
+                modal.style.display = 'none'
+                this.currentPlanId = null
+                this.isEditing = false
+            }
+
+            async savePlan() {
+                const form = document.getElementById('plan-form')
+                const submitBtn = form.querySelector('button[type="submit"]')
+                const submitText = submitBtn.querySelector('#submit-text')
+                const spinner = submitBtn.querySelector('.spinner')
+                
+                // Show loading state
+                submitText.style.display = 'none'
+                spinner.style.display = 'block'
+                submitBtn.disabled = true
+
+                try {
+                    const planData = {
+                        month: form.month.value,
+                        year: parseInt(form.year.value),
+                        theme: form.theme.value || null,
+                        activities: JSON.stringify(form.activities.value.split('\n').filter(line => line.trim())),
+                        scriptures: JSON.stringify(form.scriptures.value.split('\n').filter(line => line.trim())),
+                        goals: JSON.stringify(form.goals.value.split('\n').filter(line => line.trim())),
+                        created_by: authManager.getUser().id
+                    }
+
+                    // Handle file upload if exists
+                    const fileInput = form.querySelector('#plan-file')
+                    if (fileInput.files.length > 0) {
+                        const file = fileInput.files[0]
+                        const fileUrl = await plansManager.uploadPlanFile(file, planData.year)
+                        planData.file_url = fileUrl
+                    }
+
+                    if (this.isEditing && this.currentPlanId) {
+                        await plansManager.updatePlan(this.currentPlanId, planData)
+                        this.showNotification('Plan updated successfully!', 'success')
+                    } else {
+                        await plansManager.createPlan(planData)
+                        this.showNotification('Plan created successfully!', 'success')
+                    }
+
+                    // Reload plans
+                    await this.loadPlans(planData.year)
+                    
+                    // Close modal
+                    this.closePlanModal()
+                } catch (error) {
+                    console.error('Error saving plan:', error)
+                    this.showNotification('Failed to save plan', 'error')
+                } finally {
+                    // Reset button state
+                    submitText.style.display = 'inline'
+                    spinner.style.display = 'none'
+                    submitBtn.disabled = false
+                }
+            }
+
+            viewPlan(planId) {
+                const plan = this.plans.find(p => p.id === planId)
+                if (!plan) return
+
+                const modal = document.getElementById('view-modal')
+                const content = document.getElementById('view-content')
+                
+                content.innerHTML = `
+                    <h2>${plan.month} ${plan.year}</h2>
+                    
+                    ${plan.theme ? `
+                        <div class="view-section">
+                            <h3><i class="fas fa-palette"></i> Theme</h3>
+                            <p>${plan.theme}</p>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="view-section">
+                        <h3><i class="fas fa-tasks"></i> Key Activities</h3>
+                        <ul>
+                            ${JSON.parse(plan.activities || '[]').map(activity => `
+                                <li>${activity}</li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                    
+                    ${plan.scriptures ? `
+                        <div class="view-section">
+                            <h3><i class="fas fa-bible"></i> Focus Scriptures</h3>
+                            <ul>
+                                ${JSON.parse(plan.scriptures || '[]').map(scripture => `
+                                    <li>${scripture}</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                    
+                    ${plan.goals ? `
+                        <div class="view-section">
+                            <h3><i class="fas fa-bullseye"></i> Goals & Objectives</h3>
+                            <ul>
+                                ${JSON.parse(plan.goals || '[]').map(goal => `
+                                    <li>${goal}</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                    
+                    ${plan.file_url ? `
+                        <div class="view-section">
+                            <h3><i class="fas fa-file"></i> Documents</h3>
+                            <a href="${plan.file_url}" target="_blank" class="btn btn-outline">
+                                <i class="fas fa-download"></i> Download Plan Document
+                            </a>
+                        </div>
+                    ` : ''}
+                `
+                
+                modal.style.display = 'flex'
+            }
+
+            closeViewModal() {
+                const modal = document.getElementById('view-modal')
+                modal.style.display = 'none'
+            }
+
+            editPlan(planId) {
+                const plan = this.plans.find(p => p.id === planId)
+                if (plan) {
+                    this.openPlanForm(plan)
+                }
+            }
+
+            showNotification(message, type) {
+                const notification = document.createElement('div')
+                notification.className = `notification ${type}`
+                notification.textContent = message
+                document.body.appendChild(notification)
+                
+                setTimeout(() => notification.classList.add('show'), 100)
+                
+                setTimeout(() => {
+                    notification.classList.remove('show')
+                    setTimeout(() => notification.remove(), 300)
+                }, 5000)
+            }
+
+            setupLogout() {
+                document.getElementById('logout-btn').addEventListener('click', async () => {
+                    await authManager.signOut()
+                    window.location.href = '/admin/login.html'
+                })
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new ManagePlans()
+        })
+    </script>
+
+    <style>
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .plans-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .plan-card {
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: transform var(--transition-normal);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .plan-card-header {
+            background: linear-gradient(135deg, var(--primary-red), var(--gold));
+            color: var(--white);
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .plan-card-header h3 {
+            margin: 0;
+            color: var(--white);
+            font-size: 1.5rem;
+        }
+        
+        .year-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .plan-card-content {
+            padding: 1.5rem;
+            flex: 1;
+        }
+        
+        .plan-theme {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: rgba(168, 218, 220, 0.1);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .plan-theme strong {
+            color: var(--dark-blue);
+        }
+        
+        .plan-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 0.5rem;
+        }
+        
+        .summary-item i {
+            color: var(--gold);
+            font-size: 1.2rem;
+        }
+        
+        .summary-item span {
+            font-size: 0.8rem;
+            color: var(--dark-gray);
+            font-weight: 500;
+        }
+        
+        .plan-card-actions {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--light-gray);
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .plan-card-actions .btn {
+            flex: 1;
+        }
+        
+        .view-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .view-section h3 {
+            color: var(--dark-blue);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .view-section h3 i {
+            color: var(--gold);
+        }
+        
+        .view-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .view-section li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--light-gray);
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .view-section li:before {
+            content: '•';
+            color: var(--gold);
+            position: absolute;
+            left: 0;
+        }
+        
+        .view-section li:last-child {
+            border-bottom: none;
+        }
+        
+        .no-plans-message {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem;
+            background: var(--light-gray);
+            border-radius: 12px;
+        }
+        
+        @media (max-width: 768px) {
+            .plans-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .header-actions {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.75rem;
+            }
+            
+            .plan-summary {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .plans-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</body>
+</html>
