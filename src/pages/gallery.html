@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery - Gwarinpa AYF</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
+</head>
+<body>
+    <main-navbar></main-navbar>
+
+    <section class="gallery-header section-padding">
+        <div class="container">
+            <h1>Photo Gallery</h1>
+            <p class="subtitle">Capturing moments of fellowship, worship, and community service</p>
+            
+            <div class="gallery-filters">
+                <button class="filter-btn active" data-filter="all">All Photos</button>
+                <button class="filter-btn" data-filter="events">Events</button>
+                <button class="filter-btn" data-filter="worship">Worship</button>
+                <button class="filter-btn" data-filter="outreach">Outreach</button>
+                <button class="filter-btn" data-filter="fellowship">Fellowship</button>
+                <button class="filter-btn" data-filter="special">Special Programs</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="gallery-content section-padding">
+        <div class="container">
+            <div id="gallery-grid" class="gallery-grid">
+                <!-- Gallery items loaded dynamically -->
+            </div>
+            
+            <div id="loading" class="text-center">
+                <div class="loading"></div>
+                <p>Loading gallery...</p>
+            </div>
+            
+            <div id="no-images" class="text-center" style="display: none;">
+                <i class="fas fa-images fa-3x mb-3" style="color: var(--light-blue);"></i>
+                <h3>No images found</h3>
+                <p>Check back soon for new photos!</p>
+            </div>
+            
+            <div class="text-center mt-4">
+                <button id="load-more" class="btn btn-secondary" style="display: none;">
+                    <i class="fas fa-plus"></i> Load More
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section class="video-gallery section-padding">
+        <div class="container">
+            <h2 class="text-center mb-4">Video Highlights</h2>
+            <div id="video-grid" class="video-grid">
+                <!-- Videos loaded dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <main-footer></main-footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+    <script type="module" src="/src/components/Navbar.html"></script>
+    <script type="module" src="/src/components/Footer.html"></script>
+    
+    <script type="module">
+        import { galleryManager } from '/src/supabase/gallery.js'
+
+        class GalleryPage {
+            constructor() {
+                this.galleryItems = []
+                this.filteredItems = []
+                this.currentFilter = 'all'
+                this.currentPage = 1
+                this.itemsPerPage = 12
+                this.init()
+            }
+
+            async init() {
+                await this.loadGalleryItems()
+                this.setupFilters()
+                this.setupLightbox()
+                this.setupLoadMore()
+            }
+
+            async loadGalleryItems() {
+                try {
+                    this.galleryItems = await galleryManager.getGalleryItems()
+                    this.filterGallery('all')
+                    document.getElementById('loading').style.display = 'none'
+                    
+                    if (this.galleryItems.length === 0) {
+                        document.getElementById('no-images').style.display = 'block'
+                    } else if (this.galleryItems.length > this.itemsPerPage) {
+                        document.getElementById('load-more').style.display = 'inline-flex'
+                    }
+                } catch (error) {
+                    console.error('Error loading gallery:', error)
+                    document.getElementById('loading').innerHTML = 
+                        '<p class="error">Failed to load gallery. Please try again later.</p>'
+                }
+            }
+
+            filterGallery(filter) {
+                this.currentFilter = filter
+                this.currentPage = 1
+                
+                if (filter === 'all') {
+                    this.filteredItems = this.galleryItems
+                } else {
+                    this.filteredItems = this.galleryItems.filter(item => 
+                        item.category === filter
+                    )
+                }
+                
+                this.renderGallery()
+            }
+
+            renderGallery() {
+                const container = document.getElementById('gallery-grid')
+                const start = 0
+                const end = this.currentPage * this.itemsPerPage
+                const itemsToShow = this.filteredItems.slice(start, end)
+                
+                if (itemsToShow.length === 0) {
+                    container.innerHTML = `
+                        <div class="no-images">
+                            <p>No ${this.currentFilter === 'all' ? '' : this.currentFilter} images found.</p>
+                        </div>
+                    `
+                    document.getElementById('load-more').style.display = 'none'
+                    return
+                }
+                
+                container.innerHTML = itemsToShow.map(item => `
+                    <div class="gallery-item" data-category="${item.category || 'uncategorized'}">
+                        <a href="${item.image_url}" data-lightbox="gallery" data-title="${item.description || ''}">
+                            <img src="${item.image_url}" alt="${item.description || 'Gallery image'}" loading="lazy">
+                            <div class="gallery-overlay">
+                                <div class="overlay-content">
+                                    <p>${item.description || ''}</p>
+                                    <span class="category-badge">${item.category || 'General'}</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                `).join('')
+                
+                // Show/hide load more button
+                const loadMoreBtn = document.getElementById('load-more')
+                if (end >= this.filteredItems.length) {
+                    loadMoreBtn.style.display = 'none'
+                } else {
+                    loadMoreBtn.style.display = 'inline-flex'
+                }
+            }
+
+            setupFilters() {
+                const filterButtons = document.querySelectorAll('.filter-btn')
+                filterButtons.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        filterButtons.forEach(b => b.classList.remove('active'))
+                        btn.classList.add('active')
+                        this.filterGallery(btn.dataset.filter)
+                    })
+                })
+            }
+
+            setupLightbox() {
+                lightbox.option({
+                    'resizeDuration': 200,
+                    'wrapAround': true,
+                    'albumLabel': 'Image %1 of %2',
+                    'fadeDuration': 300
+                })
+            }
+
+            setupLoadMore() {
+                const loadMoreBtn = document.getElementById('load-more')
+                loadMoreBtn.addEventListener('click', () => {
+                    this.currentPage++
+                    this.renderGallery()
+                })
+            }
+
+            async loadVideos() {
+                // This would fetch videos from a videos table
+                // For now, we'll use placeholder videos
+                const videos = [
+                    {
+                        id: 1,
+                        title: "Youth Sunday Service",
+                        thumbnail: "https://via.placeholder.com/300x200",
+                        url: "https://www.youtube.com/watch?v=example1"
+                    },
+                    {
+                        id: 2,
+                        title: "Community Outreach 2024",
+                        thumbnail: "https://via.placeholder.com/300x200",
+                        url: "https://www.youtube.com/watch?v=example2"
+                    }
+                ]
+                
+                const container = document.getElementById('video-grid')
+                container.innerHTML = videos.map(video => `
+                    <div class="video-item">
+                        <a href="${video.url}" target="_blank" class="video-link">
+                            <div class="video-thumbnail">
+                                <img src="${video.thumbnail}" alt="${video.title}">
+                                <div class="play-button">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                            </div>
+                            <h4>${video.title}</h4>
+                        </a>
+                    </div>
+                `).join('')
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const galleryPage = new GalleryPage()
+            galleryPage.loadVideos()
+        })
+    </script>
+
+    <style>
+        .gallery-header {
+            background: linear-gradient(135deg, rgba(168, 218, 220, 0.1), rgba(244, 162, 97, 0.1));
+            text-align: center;
+        }
+        
+        .gallery-header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--dark-gray);
+            margin-bottom: 2rem;
+        }
+        
+        .gallery-filters {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 0.5rem 1.25rem;
+            border: 2px solid var(--light-blue);
+            background: transparent;
+            border-radius: 20px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: 0.9rem;
+        }
+        
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--primary-red);
+            border-color: var(--primary-red);
+            color: var(--white);
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .gallery-item {
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 1;
+            cursor: pointer;
+            transition: transform var(--transition-normal);
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform var(--transition-normal);
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        .gallery-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            padding: 1rem;
+            transform: translateY(100%);
+            transition: transform var(--transition-normal);
+            color: var(--white);
+        }
+        
+        .gallery-item:hover .gallery-overlay {
+            transform: translateY(0);
+        }
+        
+        .overlay-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .overlay-content p {
+            margin: 0;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .category-badge {
+            background: var(--gold);
+            color: var(--white);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            align-self: flex-start;
+        }
+        
+        .video-gallery {
+            background: linear-gradient(135deg, rgba(29, 53, 87, 0.05), rgba(244, 162, 97, 0.05));
+        }
+        
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .video-item {
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: transform var(--transition-normal);
+        }
+        
+        .video-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .video-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .video-thumbnail {
+            position: relative;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+        }
+        
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(230, 57, 70, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1.5rem;
+            transition: all var(--transition-normal);
+        }
+        
+        .video-item:hover .play-button {
+            background: var(--primary-red);
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        
+        .video-item h4 {
+            padding: 1rem;
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--dark-blue);
+            transition: color var(--transition-fast);
+        }
+        
+        .video-item:hover h4 {
+            color: var(--primary-red);
+        }
+        
+        .no-images {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem;
+            background: var(--light-gray);
+            border-radius: 12px;
+        }
+        
+        @media (max-width: 768px) {
+            .gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            
+            .gallery-filters {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .filter-btn {
+                width: 100%;
+                max-width: 250px;
+            }
+            
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Lightbox customization */
+        .lb-outerContainer {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .lb-data .lb-caption {
+            font-size: 1rem;
+            line-height: 1.5;
+            padding: 1rem 0;
+        }
+        
+        .lb-data .lb-close {
+            background: var(--primary-red);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</body>
+</html>
