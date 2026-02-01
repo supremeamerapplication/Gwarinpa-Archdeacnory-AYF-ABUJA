@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Gwarinpa AYF</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <main-navbar></main-navbar>
+
+    <section class="contact-header section-padding">
+        <div class="container">
+            <h1>Get in Touch</h1>
+            <p class="subtitle">We'd love to hear from you! Reach out for more information or to join our fellowship.</p>
+        </div>
+    </section>
+
+    <section class="contact-content section-padding">
+        <div class="container">
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h2>Contact Information</h2>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="info-content">
+                            <h4>Our Location</h4>
+                            <p>Gwarinpa Anglican Church<br>
+                               Gwarinpa Estate<br>
+                               Abuja, Nigeria</p>
+                            <a href="https://maps.google.com/?q=Gwarinpa+Anglican+Church+Abuja" target="_blank" class="link">
+                                View on Map <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="info-content">
+                            <h4>Service Times</h4>
+                            <p><strong>Sundays:</strong><br>
+                               Youth Service: 8:00 AM - 11:00 AM<br>
+                               Bible Study: 4:00 PM - 6:00 PM</p>
+                            <p><strong>Wednesdays:</strong><br>
+                               Prayer Meeting: 6:00 PM - 7:30 PM</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="info-content">
+                            <h4>Phone & Email</h4>
+                            <p><strong>Phone:</strong> +234 123 456 7890</p>
+                            <p><strong>Email:</strong> info@gwarinpaayf.org</p>
+                            <p><strong>Youth Leader:</strong> pastor.youth@gwarinpaanglican.org</p>
+                        </div>
+                    </div>
+                    
+                    <div class="social-connect">
+                        <h4>Connect With Us</h4>
+                        <div class="social-links">
+                            <a href="#" class="social-link" aria-label="Facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="social-link" aria-label="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="social-link" aria-label="Twitter">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="social-link" aria-label="YouTube">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                            <a href="#" class="social-link" aria-label="WhatsApp">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="contact-form-container">
+                    <div class="form-card">
+                        <h3>Send us a Message</h3>
+                        <p>Fill out the form below and we'll get back to you as soon as possible.</p>
+                        
+                        <form id="contact-form" class="contact-form">
+                            <div class="form-group">
+                                <label for="name">Full Name *</label>
+                                <input type="text" id="name" name="name" required class="form-control">
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="email">Email Address *</label>
+                                    <input type="email" id="email" name="email" required class="form-control">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="phone">Phone Number</label>
+                                    <input type="tel" id="phone" name="phone" class="form-control">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="subject">Subject *</label>
+                                <select id="subject" name="subject" required class="form-control">
+                                    <option value="">Select a subject</option>
+                                    <option value="membership">Membership Inquiry</option>
+                                    <option value="events">Event Information</option>
+                                    <option value="prayer">Prayer Request</option>
+                                    <option value="volunteer">Volunteer Opportunity</option>
+                                    <option value="feedback">Feedback/Suggestion</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="message">Message *</label>
+                                <textarea id="message" name="message" rows="5" required class="form-control"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="newsletter" name="newsletter">
+                                    <label for="newsletter">Subscribe to our newsletter for updates</label>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <span class="btn-text">Send Message</span>
+                                <div class="spinner" style="display: none;"></div>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="meet-team section-padding">
+        <div class="container">
+            <h2 class="text-center mb-4">Meet Our Youth Leaders</h2>
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="https://via.placeholder.com/300x300" alt="Youth Pastor">
+                    </div>
+                    <div class="member-info">
+                        <h4>Rev. John Adeyemi</h4>
+                        <p class="role">Youth Pastor</p>
+                        <p>Passionate about youth development and spiritual growth. Leads our weekly Bible studies and discipleship programs.</p>
+                        <a href="mailto:pastor.john@gwarinpaayf.org" class="link">
+                            <i class="fas fa-envelope"></i> Send Email
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="https://via.placeholder.com/300x300" alt="Youth Coordinator">
+                    </div>
+                    <div class="member-info">
+                        <h4>Sister Grace Okon</h4>
+                        <p class="role">Youth Coordinator</p>
+                        <p>Organizes events and coordinates volunteer activities. Always ready to welcome new members.</p>
+                        <a href="mailto:grace.okon@gwarinpaayf.org" class="link">
+                            <i class="fas fa-envelope"></i> Send Email
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="https://via.placeholder.com/300x300" alt="Worship Leader">
+                    </div>
+                    <div class="member-info">
+                        <h4>Brother David Musa</h4>
+                        <p class="role">Worship Leader</p>
+                        <p>Leads our vibrant worship team and music ministry. Believes in praising God with excellence.</p>
+                        <a href="mailto:david.musa@gwarinpaayf.org" class="link">
+                            <i class="fas fa-envelope"></i> Send Email
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="faq-section section-padding">
+        <div class="container">
+            <h2 class="text-center mb-4">Frequently Asked Questions</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h4>Who can join the Youth Fellowship?</h4>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>The Youth Fellowship is open to all young people between the ages of 13 and 35. We welcome both members of Gwarinpa Anglican Church and visitors from other churches.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h4>When and where do you meet?</h4>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We meet every Sunday at 8:00 AM in the church auditorium for Youth Service. We also have Bible Study on Sundays at 4:00 PM and Prayer Meeting on Wednesdays at 6:00 PM.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h4>Do I need to register to attend events?</h4>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>For regular meetings, no registration is required. However, for special events, retreats, and outreach programs, registration is usually required. Check our Events page for details.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h4>How can I get involved in serving?</h4>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We have various service opportunities including ushering, media team, worship team, outreach committee, and more. Contact any of our leaders or fill out the contact form to express interest.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main-footer></main-footer>
+
+    <script type="module" src="/src/components/Navbar.html"></script>
+    <script type="module" src="/src/components/Footer.html"></script>
+    
+    <script>
+        class ContactPage {
+            constructor() {
+                this.initForm()
+                this.initFAQ()
+            }
+
+            initForm() {
+                const form = document.getElementById('contact-form')
+                const submitBtn = form.querySelector('button[type="submit"]')
+                const btnText = submitBtn.querySelector('.btn-text')
+                const spinner = submitBtn.querySelector('.spinner')
+
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault()
+                    
+                    // Show loading state
+                    btnText.style.display = 'none'
+                    spinner.style.display = 'block'
+                    submitBtn.disabled = true
+
+                    // Get form data
+                    const formData = new FormData(form)
+                    const data = Object.fromEntries(formData.entries())
+
+                    try {
+                        // Simulate API call
+                        await new Promise(resolve => setTimeout(resolve, 1500))
+                        
+                        // Show success message
+                        this.showNotification('Message sent successfully! We\'ll get back to you soon.', 'success')
+                        form.reset()
+                    } catch (error) {
+                        this.showNotification('Failed to send message. Please try again.', 'error')
+                    } finally {
+                        // Reset button state
+                        btnText.style.display = 'inline'
+                        spinner.style.display = 'none'
+                        submitBtn.disabled = false
+                    }
+                })
+            }
+
+            initFAQ() {
+                const faqItems = document.querySelectorAll('.faq-item')
+                
+                faqItems.forEach(item => {
+                    const question = item.querySelector('.faq-question')
+                    const answer = item.querySelector('.faq-answer')
+                    const icon = question.querySelector('i')
+                    
+                    question.addEventListener('click', () => {
+                        // Close all other FAQ items
+                        faqItems.forEach(otherItem => {
+                            if (otherItem !== item) {
+                                otherItem.classList.remove('active')
+                                otherItem.querySelector('.faq-answer').style.maxHeight = null
+                                otherItem.querySelector('i').classList.remove('fa-chevron-up')
+                                otherItem.querySelector('i').classList.add('fa-chevron-down')
+                            }
+                        })
+                        
+                        // Toggle current item
+                        item.classList.toggle('active')
+                        
+                        if (item.classList.contains('active')) {
+                            answer.style.maxHeight = answer.scrollHeight + 'px'
+                            icon.classList.remove('fa-chevron-down')
+                            icon.classList.add('fa-chevron-up')
+                        } else {
+                            answer.style.maxHeight = null
+                            icon.classList.remove('fa-chevron-up')
+                            icon.classList.add('fa-chevron-down')
+                        }
+                    })
+                })
+            }
+
+            showNotification(message, type) {
+                const notification = document.createElement('div')
+                notification.className = `notification ${type}`
+                notification.textContent = message
+                document.body.appendChild(notification)
+                
+                // Trigger animation
+                setTimeout(() => notification.classList.add('show'), 100)
+                
+                // Remove after 5 seconds
+                setTimeout(() => {
+                    notification.classList.remove('show')
+                    setTimeout(() => notification.remove(), 300)
+                }, 5000)
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactPage()
+        })
+    </script>
+
+    <style>
+        .contact-header {
+            background: linear-gradient(135deg, rgba(230, 57, 70, 0.1), rgba(244, 162, 97, 0.1));
+            text-align: center;
+        }
+        
+        .contact-header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--dark-gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+        
+        .contact-info h2 {
+            color: var(--dark-blue);
+            margin-bottom: 2rem;
+        }
+        
+        .info-item {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+            align-items: flex-start;
+        }
+        
+        .info-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-red), var(--gold));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .info-content h4 {
+            color: var(--dark-blue);
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-content p {
+            margin-bottom: 0.5rem;
+            color: var(--dark-gray);
+        }
+        
+        .link {
+            color: var(--primary-red);
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color var(--transition-fast);
+        }
+        
+        .link:hover {
+            color: var(--gold);
+        }
+        
+        .social-connect {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--light-gray);
+        }
+        
+        .social-connect h4 {
+            color: var(--dark-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .social-link {
+            width: 45px;
+            height: 45px;
+            background: var(--light-gray);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark-blue);
+            text-decoration: none;
+            transition: all var(--transition-fast);
+        }
+        
+        .social-link:hover {
+            background: var(--primary-red);
+            color: var(--white);
+            transform: translateY(-3px);
+        }
+        
+        .form-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 2rem;
+        }
+        
+        .form-card h3 {
+            color: var(--dark-blue);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-card > p {
+            color: var(--dark-gray);
+            margin-bottom: 2rem;
+        }
+        
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark-blue);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e1e5eb;
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            transition: border-color var(--transition-fast);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+        
+        .form-control:invalid {
+            border-color: var(--light-red);
+        }
+        
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%231d3557' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-red);
+        }
+        
+        .checkbox-group label {
+            margin: 0;
+            font-weight: normal;
+            color: var(--dark-gray);
+        }
+        
+        .contact-form button {
+            align-self: flex-start;
+            min-width: 150px;
+            position: relative;
+        }
+        
+        .contact-form button .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--white);
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto;
+        }
+        
+        .meet-team {
+            background: linear-gradient(135deg, rgba(29, 53, 87, 0.05), rgba(244, 162, 97, 0.05));
+        }
+        
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .team-member {
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: transform var(--transition-normal);
+        }
+        
+        .team-member:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .member-image {
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .member-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform var(--transition-normal);
+        }
+        
+        .team-member:hover .member-image img {
+            transform: scale(1.05);
+        }
+        
+        .member-info {
+            padding: 1.5rem;
+        }
+        
+        .member-info h4 {
+            color: var(--dark-blue);
+            margin-bottom: 0.25rem;
+        }
+        
+        .role {
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .member-info p {
+            color: var(--dark-gray);
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+        
+        .faq-section {
+            background: var(--white);
+        }
+        
+        .faq-grid {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .faq-item {
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            background: var(--light-gray);
+            transition: background var(--transition-fast);
+        }
+        
+        .faq-question:hover {
+            background: #e8e8e8;
+        }
+        
+        .faq-question h4 {
+            margin: 0;
+            color: var(--dark-blue);
+            font-size: 1.1rem;
+        }
+        
+        .faq-question i {
+            color: var(--gold);
+            transition: transform var(--transition-fast);
+        }
+        
+        .faq-answer {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height var(--transition-normal);
+        }
+        
+        .faq-answer p {
+            padding: 1.5rem 0;
+            margin: 0;
+            color: var(--dark-gray);
+        }
+        
+        @media (max-width: 992px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+            
+            .form-card {
+                position: static;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .faq-question {
+                padding: 1rem;
+            }
+            
+            .faq-question h4 {
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .contact-grid {
+                gap: 2rem;
+            }
+            
+            .form-card {
+                padding: 1.5rem;
+            }
+            
+            .info-item {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .social-links {
+                justify-content: center;
+            }
+        }
+    </style>
+</body>
+</html>
