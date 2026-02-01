@@ -1,0 +1,51 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/src/index.html"
+    },
+    {
+      "source": "/events",
+      "destination": "/src/pages/events.html"
+    },
+    {
+      "source": "/gallery",
+      "destination": "/src/pages/gallery.html"
+    },
+    {
+      "source": "/yearly-plan",
+      "destination": "/src/pages/yearly-plan.html"
+    },
+    {
+      "source": "/contact",
+      "destination": "/src/pages/contact.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/src/admin/dashboard.html"
+    },
+    {
+      "source": "/admin/(.*)",
+      "destination": "/src/admin/$1"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    }
+  ]
+}
