@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Gwarinpa AYF</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+    <link rel="stylesheet" href="/src/admin/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <img src="/images/logo.png" alt="Logo" height="40">
+                <h3>AYF Admin</h3>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="/admin/dashboard.html" class="nav-item active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/manage-events.html" class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Manage Events</span>
+                </a>
+                <a href="/admin/manage-gallery.html" class="nav-item">
+                    <i class="fas fa-images"></i>
+                    <span>Manage Gallery</span>
+                </a>
+                <a href="/admin/manage-plans.html" class="nav-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>Yearly Plans</span>
+                </a>
+                <a href="/admin/manage-announcements.html" class="nav-item">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Announcements</span>
+                </a>
+                <a href="/admin/manage-users.html" class="nav-item">
+                    <i class="fas fa-users-cog"></i>
+                    <span>Manage Users</span>
+                </a>
+                <a href="/" class="nav-item">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span>View Site</span>
+                </a>
+                <button id="logout-btn" class="nav-item logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>Dashboard Overview</h1>
+                <div class="user-info">
+                    <span id="user-email"></span>
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Stats Cards -->
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-icon upcoming">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="upcoming-count">0</h3>
+                        <p>Upcoming Events</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon gallery">
+                        <i class="fas fa-images"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="gallery-count">0</h3>
+                        <p>Gallery Items</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon rsvp">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="rsvp-count">0</h3>
+                        <p>Total RSVPs</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon plans">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="plans-count">0</h3>
+                        <p>Monthly Plans</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h2>Quick Actions</h2>
+                <div class="action-grid">
+                    <a href="/admin/manage-events.html?action=create" class="action-card">
+                        <i class="fas fa-plus-circle"></i>
+                        <h4>Add New Event</h4>
+                        <p>Create and schedule a new event</p>
+                    </a>
+                    
+                    <a href="/admin/manage-gallery.html?action=upload" class="action-card">
+                        <i class="fas fa-upload"></i>
+                        <h4>Upload Photos</h4>
+                        <p>Add new photos to gallery</p>
+                    </a>
+                    
+                    <a href="/admin/manage-plans.html?action=create" class="action-card">
+                        <i class="fas fa-file-alt"></i>
+                        <h4>Add Monthly Plan</h4>
+                        <p>Create plan for a new month</p>
+                    </a>
+                    
+                    <a href="/admin/manage-announcements.html" class="action-card">
+                        <i class="fas fa-bullhorn"></i>
+                        <h4>Post Announcement</h4>
+                        <p>Share news with members</p>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="recent-activity">
+                <h2>Recent Activity</h2>
+                <div id="activity-feed" class="activity-feed">
+                    <!-- Activity loaded dynamically -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { authManager } from '/src/supabase/auth.js'
+        import { eventsManager } from '/src/supabase/events.js'
+        import { galleryManager } from '/src/supabase/gallery.js'
+        import { plansManager } from '/src/supabase/plans.js'
+
+        // Check authentication
+        async function checkAuth() {
+            const user = authManager.getUser()
+            if (!user || !authManager.isAdmin()) {
+                window.location.href = '/admin/login.html'
+                return false
+            }
+            
+            document.getElementById('user-email').textContent = user.email
+            return true
+        }
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                // Load counts
+                const events = await eventsManager.getAllEvents()
+                const galleryItems = await galleryManager.getGalleryItems()
+                const yearlyPlans = await plansManager.getYearlyPlan()
+                
+                document.getElementById('upcoming-count').textContent = events.length
+                document.getElementById('gallery-count').textContent = galleryItems.length
+                document.getElementById('plans-count').textContent = yearlyPlans.length
+                
+                // Load recent activity
+                loadRecentActivity(events, galleryItems)
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error)
+                showNotification('Error loading dashboard data', 'error')
+            }
+        }
+
+        function loadRecentActivity(events, galleryItems) {
+            const feed = document.getElementById('activity-feed')
+            const activities = []
+            
+            // Add recent events
+            events.slice(0, 3).forEach(event => {
+                activities.push({
+                    type: 'event',
+                    title: `New Event: ${event.title}`,
+                    date: event.date,
+                    icon: 'calendar'
+                })
+            })
+            
+            // Add recent gallery uploads
+            galleryItems.slice(0, 2).forEach(item => {
+                activities.push({
+                    type: 'gallery',
+                    title: 'New photo uploaded',
+                    date: item.created_at,
+                    icon: 'image'
+                })
+            })
+            
+            // Sort by date
+            activities.sort((a, b) => new Date(b.date) - new Date(a.date))
+            
+            feed.innerHTML = activities.slice(0, 5).map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-${activity.icon}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <p>${activity.title}</p>
+                        <small>${new Date(activity.date).toLocaleDateString()}</small>
+                    </div>
+                </div>
+            `).join('')
+        }
+
+        // Logout handler
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            await authManager.signOut()
+            window.location.href = '/admin/login.html'
+        })
+
+        // Initialize dashboard
+        async function initDashboard() {
+            const isAuthenticated = await checkAuth()
+            if (isAuthenticated) {
+                await loadDashboardData()
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initDashboard)
+    </script>
+</body>
+</html>
