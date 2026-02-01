@@ -1,0 +1,187 @@
+<nav class="navbar">
+  <div class="container">
+    <div class="nav-brand">
+      <a href="/" class="logo">
+        <img src="/images/logo.png" alt="Gwarinpa AYF Logo" height="50">
+        <span>Gwarinpa AYF</span>
+      </a>
+    </div>
+    
+    <button class="nav-toggle" aria-label="Toggle navigation">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    
+    <div class="nav-menu">
+      <a href="/" class="nav-link active">Home</a>
+      <a href="/events.html" class="nav-link">Events</a>
+      <a href="/gallery.html" class="nav-link">Gallery</a>
+      <a href="/yearly-plan.html" class="nav-link">Yearly Plan</a>
+      <a href="/contact.html" class="nav-link">Contact</a>
+      <div id="auth-buttons" class="auth-buttons"></div>
+    </div>
+  </div>
+</nav>
+
+<style>
+  .navbar {
+    background: var(--white);
+    box-shadow: var(--shadow-sm);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 1rem 0;
+  }
+  
+  .nav-brand {
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: var(--dark-blue);
+    font-weight: 700;
+    font-size: 1.5rem;
+  }
+  
+  .logo img {
+    height: 50px;
+    width: auto;
+  }
+  
+  .nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+  }
+  
+  .nav-toggle span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background: var(--dark-blue);
+    margin: 5px 0;
+    transition: var(--transition-normal);
+  }
+  
+  .nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-left: auto;
+  }
+  
+  .nav-link {
+    color: var(--dark-blue);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    transition: all var(--transition-fast);
+  }
+  
+  .nav-link:hover,
+  .nav-link.active {
+    background: linear-gradient(135deg, var(--primary-red), var(--gold));
+    color: var(--white);
+  }
+  
+  .auth-buttons {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+  
+  @media (max-width: 768px) {
+    .nav-toggle {
+      display: block;
+    }
+    
+    .nav-menu {
+      position: fixed;
+      top: 80px;
+      left: 0;
+      width: 100%;
+      background: var(--white);
+      flex-direction: column;
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
+      transform: translateY(-100%);
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--transition-normal);
+    }
+    
+    .nav-menu.active {
+      transform: translateY(0);
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .nav-toggle.active span:nth-child(1) {
+      transform: rotate(45deg) translate(6px, 6px);
+    }
+    
+    .nav-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+    
+    .nav-toggle.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(6px, -6px);
+    }
+  }
+</style>
+
+<script>
+  class Navbar extends HTMLElement {
+    connectedCallback() {
+      this.renderAuthButtons()
+      this.setupMobileMenu()
+      window.addEventListener('authChange', () => this.renderAuthButtons())
+    }
+    
+    setupMobileMenu() {
+      const toggle = this.querySelector('.nav-toggle')
+      const menu = this.querySelector('.nav-menu')
+      
+      toggle?.addEventListener('click', () => {
+        toggle.classList.toggle('active')
+        menu.classList.toggle('active')
+      })
+    }
+    
+    async renderAuthButtons() {
+      const container = this.querySelector('#auth-buttons')
+      if (!container) return
+      
+      const { authManager } = await import('../supabase/auth.js')
+      const user = authManager.getUser()
+      
+      if (user) {
+        container.innerHTML = `
+          <span class="user-email">${user.email}</span>
+          <a href="/admin/dashboard.html" class="btn btn-primary btn-sm">Dashboard</a>
+          <button id="logout-btn" class="btn btn-secondary btn-sm">Logout</button>
+        `
+        
+        this.querySelector('#logout-btn')?.addEventListener('click', async () => {
+          await authManager.signOut()
+          window.location.href = '/'
+        })
+      } else {
+        container.innerHTML = `
+          <a href="/admin/login.html" class="btn btn-primary btn-sm">Admin Login</a>
+        `
+      }
+    }
+  }
+  
+  customElements.define('main-navbar', Navbar)
+</script>
