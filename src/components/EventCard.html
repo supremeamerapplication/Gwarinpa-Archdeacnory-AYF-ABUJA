@@ -1,0 +1,226 @@
+<div class="event-card">
+  <div class="event-image">
+    <img src="" alt="Event Image" loading="lazy">
+    <div class="event-date">
+      <span class="date-day"></span>
+      <span class="date-month"></span>
+    </div>
+  </div>
+  
+  <div class="event-content">
+    <h3 class="event-title"></h3>
+    <div class="event-meta">
+      <span class="event-time">
+        <i class="fas fa-clock"></i>
+        <span class="time-text"></span>
+      </span>
+      <span class="event-location">
+        <i class="fas fa-map-marker-alt"></i>
+        <span class="location-text"></span>
+      </span>
+    </div>
+    <p class="event-description"></p>
+    <div class="event-actions">
+      <button class="btn btn-primary rsvp-btn">RSVP Now</button>
+      <button class="btn btn-outline details-btn">View Details</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .event-card {
+    background: var(--white);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-normal);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .event-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .event-image {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+  }
+  
+  .event-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-normal);
+  }
+  
+  .event-card:hover .event-image img {
+    transform: scale(1.05);
+  }
+  
+  .event-date {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: var(--primary-red);
+    color: var(--white);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    text-align: center;
+    min-width: 60px;
+  }
+  
+  .date-day {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+  
+  .date-month {
+    display: block;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .event-content {
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .event-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--dark-blue);
+  }
+  
+  .event-meta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: var(--dark-gray);
+  }
+  
+  .event-meta i {
+    color: var(--gold);
+    margin-right: 0.5rem;
+  }
+  
+  .event-description {
+    margin-bottom: 1.5rem;
+    color: var(--dark-gray);
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .event-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: auto;
+  }
+  
+  @media (max-width: 768px) {
+    .event-actions {
+      flex-direction: column;
+    }
+    
+    .event-actions .btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  class EventCard extends HTMLElement {
+    static get observedAttributes() {
+      return ['data-event']
+    }
+    
+    attributeChangedCallback(name, oldValue, newValue) {
+      if (name === 'data-event' && newValue) {
+        this.event = JSON.parse(newValue)
+        this.render()
+        this.setupEventListeners()
+      }
+    }
+    
+    render() {
+      if (!this.event) return
+      
+      const event = this.event
+      const eventDate = new Date(event.date)
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      
+      this.querySelector('.event-title').textContent = event.title
+      this.querySelector('.event-description').textContent = event.description
+      this.querySelector('.time-text').textContent = event.time
+      this.querySelector('.location-text').textContent = event.location
+      this.querySelector('.date-day').textContent = eventDate.getDate()
+      this.querySelector('.date-month').textContent = monthNames[eventDate.getMonth()]
+      
+      const img = this.querySelector('.event-image img')
+      img.src = event.image_url || '/images/event-default.jpg'
+      img.alt = event.title
+    }
+    
+    setupEventListeners() {
+      this.querySelector('.rsvp-btn')?.addEventListener('click', () => {
+        this.openRSVPModal()
+      })
+      
+      this.querySelector('.details-btn')?.addEventListener('click', () => {
+        this.openDetailsModal()
+      })
+    }
+    
+    openRSVPModal() {
+      const modal = document.createElement('div')
+      modal.className = 'modal'
+      modal.innerHTML = `
+        <div class="modal-content">
+          <h3>RSVP for ${this.event.title}</h3>
+          <form id="rsvp-form">
+            <input type="text" placeholder="Full Name" required>
+            <input type="email" placeholder="Email Address" required>
+            <input type="tel" placeholder="Phone Number" required>
+            <input type="number" placeholder="Number of Guests" min="1" value="1">
+            <textarea placeholder="Additional Notes (Optional)"></textarea>
+            <div class="modal-actions">
+              <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+              <button type="submit" class="btn btn-primary">Submit RSVP</button>
+            </div>
+          </form>
+        </div>
+      `
+      
+      document.body.appendChild(modal)
+      
+      modal.querySelector('.close-modal').addEventListener('click', () => {
+        modal.remove()
+      })
+      
+      modal.querySelector('#rsvp-form').addEventListener('submit', async (e) => {
+        e.preventDefault()
+        // Handle RSVP submission
+        modal.remove()
+      })
+    }
+    
+    openDetailsModal() {
+      // Similar modal implementation for event details
+      console.log('Open details for:', this.event.title)
+    }
+  }
+  
+  customElements.define('event-card', EventCard)
+</script>
