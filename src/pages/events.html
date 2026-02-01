@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events - Gwarinpa AYF</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <main-navbar></main-navbar>
+
+    <section class="events-header section-padding">
+        <div class="container">
+            <h1>Upcoming Events</h1>
+            <p class="subtitle">Join us for fellowship, worship, and community activities</p>
+            
+            <div class="event-filters">
+                <button class="filter-btn active" data-filter="all">All Events</button>
+                <button class="filter-btn" data-filter="upcoming">Upcoming</button>
+                <button class="filter-btn" data-filter="past">Past Events</button>
+                <button class="filter-btn" data-filter="weekly">Weekly</button>
+                <button class="filter-btn" data-filter="special">Special Events</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="events-list section-padding">
+        <div class="container">
+            <div class="events-grid" id="events-grid">
+                <!-- Events loaded dynamically -->
+            </div>
+            
+            <div id="loading" class="text-center">
+                <div class="loading"></div>
+                <p>Loading events...</p>
+            </div>
+            
+            <div id="no-events" class="text-center" style="display: none;">
+                <i class="fas fa-calendar-times fa-3x mb-3" style="color: var(--light-red);"></i>
+                <h3>No events found</h3>
+                <p>Check back later for upcoming events!</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section section-padding">
+        <div class="container text-center">
+            <h2>Have an Event Idea?</h2>
+            <p>We're always open to suggestions for events and activities</p>
+            <a href="/contact.html" class="btn btn-primary">Contact Us</a>
+        </div>
+    </section>
+
+    <main-footer></main-footer>
+
+    <!-- Event Details Modal -->
+    <div id="event-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <div id="modal-content">
+                <!-- Event details loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/src/components/Navbar.html"></script>
+    <script type="module" src="/src/components/Footer.html"></script>
+    <script type="module" src="/src/components/EventCard.html"></script>
+    
+    <script type="module">
+        import { eventsManager } from '/src/supabase/events.js'
+
+        class EventsPage {
+            constructor() {
+                this.events = []
+                this.filteredEvents = []
+                this.currentFilter = 'all'
+                this.init()
+            }
+
+            async init() {
+                await this.loadEvents()
+                this.setupFilters()
+                this.setupModal()
+            }
+
+            async loadEvents() {
+                try {
+                    this.events = await eventsManager.getAllEvents()
+                    const pastEvents = await eventsManager.getPastEvents()
+                    this.events = [...this.events, ...pastEvents]
+                    
+                    this.filterEvents('all')
+                    document.getElementById('loading').style.display = 'none'
+                    
+                    if (this.events.length === 0) {
+                        document.getElementById('no-events').style.display = 'block'
+                    }
+                } catch (error) {
+                    console.error('Error loading events:', error)
+                    document.getElementById('loading').innerHTML = 
+                        '<p class="error">Failed to load events. Please try again later.</p>'
+                }
+            }
+
+            filterEvents(filter) {
+                this.currentFilter = filter
+                const now = new Date()
+                
+                switch(filter) {
+                    case 'upcoming':
+                        this.filteredEvents = this.events.filter(event => 
+                            new Date(event.date) >= now
+                        )
+                        break
+                    case 'past':
+                        this.filteredEvents = this.events.filter(event => 
+                            new Date(event.date) < now
+                        )
+                        break
+                    case 'weekly':
+                        this.filteredEvents = this.events.filter(event => 
+                            event.title.toLowerCase().includes('sunday') || 
+                            event.description.toLowerCase().includes('weekly')
+                        )
+                        break
+                    case 'special':
+                        this.filteredEvents = this.events.filter(event => 
+                            event.title.toLowerCase().includes('special') ||
+                            event.description.toLowerCase().includes('special')
+                        )
+                        break
+                    default:
+                        this.filteredEvents = this.events
+                }
+
+                this.renderEvents()
+            }
+
+            renderEvents() {
+                const container = document.getElementById('events-grid')
+                
+                if (this.filteredEvents.length === 0) {
+                    container.innerHTML = `
+                        <div class="no-events">
+                            <p>No ${this.currentFilter === 'all' ? '' : this.currentFilter} events found.</p>
+                        </div>
+                    `
+                    return
+                }
+
+                container.innerHTML = this.filteredEvents.map(event => `
+                    <div class="event-item" data-id="${event.id}">
+                        <event-card data-event='${JSON.stringify(event)}'></event-card>
+                    </div>
+                `).join('')
+            }
+
+            setupFilters() {
+                const filterButtons = document.querySelectorAll('.filter-btn')
+                filterButtons.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        filterButtons.forEach(b => b.classList.remove('active'))
+                        btn.classList.add('active')
+                        this.filterEvents(btn.dataset.filter)
+                    })
+                })
+            }
+
+            setupModal() {
+                const modal = document.getElementById('event-modal')
+                const closeBtn = modal.querySelector('.close-modal')
+
+                closeBtn.addEventListener('click', () => {
+                    modal.style.display = 'none'
+                })
+
+                window.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.style.display = 'none'
+                    }
+                })
+            }
+
+            showEventDetails(eventId) {
+                const event = this.events.find(e => e.id === eventId)
+                if (!event) return
+
+                const modal = document.getElementById('event-modal')
+                const content = document.getElementById('modal-content')
+                
+                const eventDate = new Date(event.date)
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
+                
+                content.innerHTML = `
+                    <div class="event-details">
+                        <div class="event-details-header">
+                            <h2>${event.title}</h2>
+                            <div class="event-meta">
+                                <span><i class="fas fa-calendar"></i> ${eventDate.toLocaleDateString('en-US', options)}</span>
+                                <span><i class="fas fa-clock"></i> ${event.time}</span>
+                                <span><i class="fas fa-map-marker-alt"></i> ${event.location}</span>
+                            </div>
+                        </div>
+                        
+                        ${event.image_url ? `
+                            <div class="event-details-image">
+                                <img src="${event.image_url}" alt="${event.title}">
+                            </div>
+                        ` : ''}
+                        
+                        <div class="event-details-content">
+                            <h3>About This Event</h3>
+                            <p>${event.description}</p>
+                            
+                            ${event.rsvp_link ? `
+                                <div class="event-cta">
+                                    <a href="${event.rsvp_link}" target="_blank" class="btn btn-primary">
+                                        <i class="fas fa-user-plus"></i> RSVP Now
+                                    </a>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `
+
+                modal.style.display = 'block'
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new EventsPage()
+        })
+    </script>
+
+    <style>
+        .events-header {
+            background: linear-gradient(135deg, rgba(230, 57, 70, 0.1), rgba(244, 162, 97, 0.1));
+            text-align: center;
+        }
+        
+        .events-header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--dark-gray);
+            margin-bottom: 2rem;
+        }
+        
+        .event-filters {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--light-blue);
+            background: transparent;
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--primary-red);
+            border-color: var(--primary-red);
+            color: var(--white);
+        }
+        
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        
+        .event-item {
+            transition: transform var(--transition-normal);
+        }
+        
+        .event-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .cta-section {
+            background: linear-gradient(135deg, var(--dark-blue), #0f1a2f);
+            color: var(--white);
+            text-align: center;
+        }
+        
+        .cta-section h2 {
+            color: var(--white);
+        }
+        
+        .cta-section p {
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .modal-content {
+            background: var(--white);
+            border-radius: 12px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            padding: 2rem;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--dark-gray);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background var(--transition-fast);
+        }
+        
+        .close-modal:hover {
+            background: var(--light-gray);
+        }
+        
+        .event-details-header {
+            margin-bottom: 2rem;
+        }
+        
+        .event-details-header h2 {
+            color: var(--dark-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .event-meta {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            color: var(--dark-gray);
+        }
+        
+        .event-meta i {
+            color: var(--gold);
+            margin-right: 0.5rem;
+        }
+        
+        .event-details-image {
+            margin-bottom: 2rem;
+            border-radius: 12px;
+            overflow: hidden;
+            max-height: 400px;
+        }
+        
+        .event-details-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .event-details-content h3 {
+            color: var(--dark-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .event-details-content p {
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+        
+        .event-cta {
+            display: flex;
+            gap: 1rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--light-gray);
+        }
+        
+        .no-events {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem;
+            background: var(--light-gray);
+            border-radius: 12px;
+        }
+        
+        .no-events i {
+            font-size: 4rem;
+            color: var(--light-red);
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .events-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .event-filters {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .filter-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .event-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .modal-content {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</body>
+</html>
