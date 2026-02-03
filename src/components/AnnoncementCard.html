@@ -1,0 +1,465 @@
+<div class="announcement-card">
+  <div class="announcement-header">
+    <span class="announcement-type"></span>
+    <span class="announcement-date"></span>
+  </div>
+  
+  <div class="announcement-content">
+    <h3 class="announcement-title"></h3>
+    <p class="announcement-excerpt"></p>
+    <div class="announcement-footer">
+      <span class="announcement-author"></span>
+      <button class="btn-read-more">Read More</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .announcement-card {
+    background: var(--white);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-normal);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .announcement-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .announcement-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, var(--primary-red), var(--gold));
+    color: var(--white);
+  }
+  
+  .announcement-type {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+  
+  .announcement-date {
+    font-size: 0.9rem;
+    opacity: 0.9;
+  }
+  
+  .announcement-content {
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .announcement-title {
+    margin: 0 0 1rem;
+    color: var(--dark-blue);
+    font-size: 1.5rem;
+    line-height: 1.3;
+  }
+  
+  .announcement-excerpt {
+    margin: 0 0 1.5rem;
+    color: var(--dark-gray);
+    line-height: 1.6;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .announcement-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--light-gray);
+  }
+  
+  .announcement-author {
+    font-size: 0.9rem;
+    color: var(--dark-gray);
+  }
+  
+  .btn-read-more {
+    background: none;
+    border: none;
+    color: var(--primary-red);
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: all var(--transition-fast);
+  }
+  
+  .btn-read-more:hover {
+    background: rgba(230, 57, 70, 0.1);
+  }
+  
+  .announcement-card.featured {
+    border: 2px solid var(--gold);
+  }
+  
+  .announcement-card.urgent .announcement-header {
+    background: linear-gradient(135deg, #dc2626, #f87171);
+  }
+  
+  .announcement-card.prayer .announcement-header {
+    background: linear-gradient(135deg, var(--dark-blue), #60a5fa);
+  }
+  
+  @media (max-width: 768px) {
+    .announcement-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    
+    .announcement-footer {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: stretch;
+    }
+    
+    .btn-read-more {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  class AnnouncementCard extends HTMLElement {
+    static get observedAttributes() {
+      return ['data-announcement']
+    }
+    
+    attributeChangedCallback(name, oldValue, newValue) {
+      if (name === 'data-announcement' && newValue) {
+        this.announcement = JSON.parse(newValue)
+        this.render()
+        this.setupEventListeners()
+      }
+    }
+    
+    render() {
+      if (!this.announcement) return
+      
+      const type = this.querySelector('.announcement-type')
+      const date = this.querySelector('.announcement-date')
+      const title = this.querySelector('.announcement-title')
+      const excerpt = this.querySelector('.announcement-excerpt')
+      const author = this.querySelector('.announcement-author')
+      
+      if (type) type.textContent = this.announcement.type || 'general'
+      
+      if (date) {
+        const dateObj = new Date(this.announcement.publish_date || this.announcement.created_at)
+        date.textContent = dateObj.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric'
+        })
+      }
+      
+      if (title) title.textContent = this.announcement.title
+      
+      if (excerpt) {
+        excerpt.textContent = this.announcement.excerpt || 
+          this.announcement.content.substring(0, 150) + '...'
+      }
+      
+      if (author) {
+        author.textContent = this.announcement.author_id ? 'Posted by Admin' : 'System'
+      }
+      
+      if (this.announcement.type === 'urgent') {
+        this.classList.add('urgent')
+      } else if (this.announcement.type === 'prayer') {
+        this.classList.add('prayer')
+      }
+      
+      if (this.announcement.is_featured) {
+        this.classList.add('featured')
+      }
+    }
+    
+    setupEventListeners() {
+      this.querySelector('.btn-read-more')?.addEventListener('click', () => {
+        this.openAnnouncementModal()
+      })
+    }
+    
+    openAnnouncementModal() {
+      const modal = document.createElement('div')
+      modal.className = 'announcement-modal'
+      
+      const dateObj = new Date(this.announcement.publish_date || this.announcement.created_at)
+      const formattedDate = dateObj.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
+      
+      modal.innerHTML = `
+        <div class="modal-content">
+          <button class="modal-close">&times;</button>
+          
+          <div class="announcement-modal-header">
+            <span class="announcement-type ${this.announcement.type}">${this.announcement.type || 'general'}</span>
+            <span class="announcement-date">${formattedDate}</span>
+          </div>
+          
+          ${this.announcement.featured_image ? `
+            <div class="announcement-modal-image">
+              <img src="${this.announcement.featured_image}" alt="${this.announcement.title}">
+            </div>
+          ` : ''}
+          
+          <div class="announcement-modal-body">
+            <h2>${this.announcement.title}</h2>
+            
+            <div class="announcement-content">
+              ${this.announcement.content.split('\n').map(para => `<p>${para}</p>`).join('')}
+            </div>
+            
+            ${this.announcement.tags && this.announcement.tags.length > 0 ? `
+              <div class="announcement-tags">
+                ${this.announcement.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+              </div>
+            ` : ''}
+            
+            <div class="announcement-meta">
+              <span class="author">${this.announcement.author_id ? 'Posted by Admin' : 'System'}</span>
+              <span class="views">${this.announcement.views || 0} views</span>
+            </div>
+          </div>
+        </div>
+      `
+      
+      document.body.appendChild(modal)
+      document.body.style.overflow = 'hidden'
+      
+      modal.querySelector('.modal-close').addEventListener('click', () => {
+        modal.remove()
+        document.body.style.overflow = ''
+      })
+      
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.remove()
+          document.body.style.overflow = ''
+        }
+      })
+      
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          modal.remove()
+          document.body.style.overflow = ''
+        }
+      })
+      
+      this.incrementViews()
+    }
+    
+    async incrementViews() {
+      try {
+        const { announcementsManager } = await import('../supabase/announcements.js')
+        await announcementsManager.incrementViews(this.announcement.id)
+      } catch (error) {
+        console.error('Error incrementing views:', error)
+      }
+    }
+  }
+  
+  customElements.define('announcement-card', AnnouncementCard)
+  
+  const style = document.createElement('style')
+  style.textContent = `
+    .announcement-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .announcement-modal .modal-content {
+      background: var(--white);
+      border-radius: 16px;
+      max-width: 800px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+    
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 2rem;
+      color: var(--dark-gray);
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background var(--transition-fast);
+      z-index: 10001;
+    }
+    
+    .modal-close:hover {
+      background: var(--light-gray);
+    }
+    
+    .announcement-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 1.5rem 1rem;
+    }
+    
+    .announcement-modal-header .announcement-type {
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-transform: capitalize;
+      color: var(--white);
+    }
+    
+    .announcement-type.general {
+      background: var(--light-blue);
+      color: var(--dark-blue);
+    }
+    
+    .announcement-type.urgent {
+      background: linear-gradient(135deg, #dc2626, #f87171);
+    }
+    
+    .announcement-type.prayer {
+      background: linear-gradient(135deg, var(--dark-blue), #60a5fa);
+    }
+    
+    .announcement-type.devotional {
+      background: linear-gradient(135deg, var(--gold), #fbbf24);
+      color: var(--dark-blue);
+    }
+    
+    .announcement-modal-header .announcement-date {
+      color: var(--dark-gray);
+      font-size: 0.9rem;
+    }
+    
+    .announcement-modal-image {
+      width: 100%;
+      max-height: 400px;
+      overflow: hidden;
+      border-radius: 8px;
+      margin: 0 1.5rem;
+    }
+    
+    .announcement-modal-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .announcement-modal-body {
+      padding: 1.5rem;
+    }
+    
+    .announcement-modal-body h2 {
+      color: var(--dark-blue);
+      margin: 0 0 1.5rem;
+      font-size: 2rem;
+    }
+    
+    .announcement-content {
+      line-height: 1.8;
+      color: var(--dark-gray);
+      margin-bottom: 2rem;
+    }
+    
+    .announcement-content p {
+      margin-bottom: 1rem;
+    }
+    
+    .announcement-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .announcement-tags .tag {
+      background: var(--light-gray);
+      color: var(--dark-gray);
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+    }
+    
+    .announcement-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--light-gray);
+      font-size: 0.9rem;
+      color: var(--dark-gray);
+    }
+    
+    @media (max-width: 768px) {
+      .announcement-modal-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+      
+      .announcement-modal-body h2 {
+        font-size: 1.5rem;
+      }
+      
+      .announcement-modal-image {
+        margin: 0 1rem;
+        max-height: 300px;
+      }
+      
+      .announcement-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+      }
+    }
+  `
+  document.head.appendChild(style)
+</script>
