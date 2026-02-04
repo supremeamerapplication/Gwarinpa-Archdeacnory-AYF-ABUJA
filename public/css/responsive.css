@@ -1,0 +1,149 @@
+/* public/css/responsive.css */
+/* Mobile First Approach */
+
+/* Small devices (phones) */
+@media (max-width: 576px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn {
+        width: 100%;
+        max-width: 250px;
+        margin-bottom: 10px;
+    }
+    
+    .download-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .events-grid,
+    .gallery-grid,
+    .announcements-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .plan-table {
+        font-size: 0.9rem;
+    }
+    
+    .plan-table th,
+    .plan-table td {
+        padding: 10px;
+    }
+}
+
+/* Medium devices (tablets) */
+@media (min-width: 577px) and (max-width: 768px) {
+    .hero-title {
+        font-size: 3rem;
+    }
+    
+    .events-grid,
+    .gallery-grid,
+    .announcements-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .plan-table {
+        font-size: 0.95rem;
+    }
+}
+
+/* Large devices (desktops) */
+@media (min-width: 769px) and (max-width: 992px) {
+    .events-grid,
+    .gallery-grid,
+    .announcements-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Extra large devices */
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1140px;
+    }
+}
+
+/* Navigation responsive */
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: block;
+    }
+    
+    .nav-links {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background: var(--dark-bg);
+        flex-direction: column;
+        padding: 20px;
+        transform: translateY(-100%);
+        opacity: 0;
+        transition: var(--transition);
+    }
+    
+    .nav-links.active {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    
+    .nav-links li {
+        margin: 10px 0;
+    }
+}
+
+/* Gallery responsive adjustments */
+@media (max-width: 768px) {
+    .gallery-item {
+        height: 200px;
+    }
+}
+
+/* Yearly plan table responsive */
+@media (max-width: 768px) {
+    .plan-table th:nth-child(3),
+    .plan-table td:nth-child(3) {
+        display: none;
+    }
+}
+
+/* Hide admin link on print */
+@media print {
+    .admin-link {
+        display: none;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    :root {
+        --primary-red: #CC0000;
+        --primary-gold: #FFCC00;
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
