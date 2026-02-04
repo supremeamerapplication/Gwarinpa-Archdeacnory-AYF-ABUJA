@@ -1,0 +1,336 @@
+<!-- public/pages/events.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events - Gwarinpa Anglican Youth Fellowship</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar Component -->
+    <div id="navbar"></div>
+
+    <!-- Events Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1 class="page-title">Upcoming Events</h1>
+            <p class="page-subtitle">Join us for fellowship, worship, and spiritual growth</p>
+        </div>
+    </section>
+
+    <!-- Events Filter -->
+    <section class="events-filter">
+        <div class="container">
+            <div class="filter-container">
+                <div class="filter-search">
+                    <input type="text" id="search-events" placeholder="Search events...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="filter-options">
+                    <select id="filter-month">
+                        <option value="">All Months</option>
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <!-- Add all months -->
+                    </select>
+                    <select id="filter-category">
+                        <option value="">All Categories</option>
+                        <option value="worship">Worship</option>
+                        <option value="bible-study">Bible Study</option>
+                        <option value="outreach">Outreach</option>
+                        <option value="fellowship">Fellowship</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- All Events -->
+    <section class="all-events">
+        <div class="container">
+            <div class="events-grid" id="all-events-grid">
+                <!-- All events will be loaded here -->
+            </div>
+            <div class="pagination" id="pagination">
+                <!-- Pagination will be added here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- No Events Message (hidden by default) -->
+    <div id="no-events" class="no-events-message" style="display: none;">
+        <div class="container">
+            <i class="fas fa-calendar-times"></i>
+            <h3>No Events Found</h3>
+            <p>There are no events matching your criteria. Check back later!</p>
+        </div>
+    </div>
+
+    <!-- Footer Component -->
+    <div id="footer"></div>
+
+    <script src="../js/supabaseClient.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/events.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load components
+            fetch('../components/navbar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('navbar').innerHTML = data;
+                    initMobileMenu();
+                });
+
+            fetch('../components/footer.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('footer').innerHTML = data;
+                });
+
+            // Load all events
+            loadAllEvents();
+
+            // Initialize filters
+            initEventFilters();
+        });
+
+        async function loadAllEvents() {
+            showLoader();
+            try {
+                const { data: events, error } = await supabase
+                    .from('events')
+                    .select('*')
+                    .gte('date', new Date().toISOString())
+                    .order('date', { ascending: true });
+
+                if (error) throw error;
+
+                if (events && events.length > 0) {
+                    window.allEvents = events;
+                    displayAllEvents(events);
+                    setupPagination(events);
+                } else {
+                    // Show no events message
+                    document.getElementById('all-events-grid').innerHTML = '';
+                    document.getElementById('no-events').style.display = 'block';
+                    document.getElementById('pagination').innerHTML = '';
+                }
+            } catch (error) {
+                console.error('Error loading events:', error);
+                // Use mock data as fallback
+                window.allEvents = getMockEvents();
+                displayAllEvents(window.allEvents);
+                setupPagination(window.allEvents);
+            } finally {
+                hideLoader();
+            }
+        }
+
+        function displayAllEvents(events) {
+            const container = document.getElementById('all-events-grid');
+            if (!container) return;
+
+            container.innerHTML = events.map(event => createEventCard(event)).join('');
+        }
+
+        function initEventFilters() {
+            const searchInput = document.getElementById('search-events');
+            const monthFilter = document.getElementById('filter-month');
+            const categoryFilter = document.getElementById('filter-category');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', filterEvents);
+            }
+            if (monthFilter) {
+                monthFilter.addEventListener('change', filterEvents);
+            }
+            if (categoryFilter) {
+                categoryFilter.addEventListener('change', filterEvents);
+            }
+        }
+
+        function filterEvents() {
+            const searchTerm = document.getElementById('search-events').value.toLowerCase();
+            const monthFilter = document.getElementById('filter-month').value;
+            const categoryFilter = document.getElementById('filter-category').value;
+
+            let filteredEvents = window.allEvents || [];
+
+            // Apply search filter
+            if (searchTerm) {
+                filteredEvents = filteredEvents.filter(event =>
+                    event.title.toLowerCase().includes(searchTerm) ||
+                    event.description.toLowerCase().includes(searchTerm) ||
+                    event.location.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // Apply month filter
+            if (monthFilter) {
+                filteredEvents = filteredEvents.filter(event => {
+                    const eventMonth = new Date(event.date).getMonth() + 1;
+                    return eventMonth.toString() === monthFilter;
+                });
+            }
+
+            // Apply category filter
+            if (categoryFilter) {
+                filteredEvents = filteredEvents.filter(event =>
+                    event.category === categoryFilter
+                );
+            }
+
+            // Display filtered events
+            if (filteredEvents.length > 0) {
+                document.getElementById('no-events').style.display = 'none';
+                displayAllEvents(filteredEvents);
+                setupPagination(filteredEvents);
+            } else {
+                document.getElementById('all-events-grid').innerHTML = '';
+                document.getElementById('no-events').style.display = 'block';
+                document.getElementById('pagination').innerHTML = '';
+            }
+        }
+
+        function setupPagination(events) {
+            const itemsPerPage = 6;
+            const totalPages = Math.ceil(events.length / itemsPerPage);
+            const paginationContainer = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                paginationContainer.innerHTML = '';
+                return;
+            }
+
+            let paginationHTML = '';
+            
+            // Previous button
+            paginationHTML += `
+                <button class="pagination-btn" onclick="goToPage(1)" title="First">
+                    <i class="fas fa-angle-double-left"></i>
+                </button>
+                <button class="pagination-btn" onclick="goToPage(currentPage - 1)" id="prev-btn" disabled>
+                    <i class="fas fa-angle-left"></i>
+                </button>
+            `;
+
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHTML += `
+                    <button class="pagination-btn ${i === 1 ? 'active' : ''}" onclick="goToPage(${i})">
+                        ${i}
+                    </button>
+                `;
+            }
+
+            // Next button
+            paginationHTML += `
+                <button class="pagination-btn" onclick="goToPage(currentPage + 1)" id="next-btn" ${totalPages === 1 ? 'disabled' : ''}>
+                    <i class="fas fa-angle-right"></i>
+                </button>
+                <button class="pagination-btn" onclick="goToPage(${totalPages})" title="Last">
+                    <i class="fas fa-angle-double-right"></i>
+                </button>
+            `;
+
+            paginationContainer.innerHTML = paginationHTML;
+            window.currentPage = 1;
+            window.totalPages = totalPages;
+            window.paginatedEvents = events;
+            updatePagination();
+        }
+
+        function goToPage(page) {
+            if (page < 1 || page > window.totalPages) return;
+            
+            window.currentPage = page;
+            const startIndex = (page - 1) * 6;
+            const endIndex = startIndex + 6;
+            const pageEvents = window.paginatedEvents.slice(startIndex, endIndex);
+            
+            displayAllEvents(pageEvents);
+            updatePagination();
+        }
+
+        function updatePagination() {
+            const paginationBtns = document.querySelectorAll('.pagination-btn');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+
+            // Update active state
+            paginationBtns.forEach((btn, index) => {
+                const pageNum = parseInt(btn.textContent);
+                if (!isNaN(pageNum)) {
+                    btn.classList.toggle('active', pageNum === window.currentPage);
+                }
+            });
+
+            // Update button states
+            if (prevBtn) {
+                prevBtn.disabled = window.currentPage === 1;
+            }
+            if (nextBtn) {
+                nextBtn.disabled = window.currentPage === window.totalPages;
+            }
+        }
+
+        function initMobileMenu() {
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const navLinks = document.querySelector('.nav-links');
+            if (mobileMenuBtn && navLinks) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    navLinks.classList.toggle('active');
+                });
+            }
+        }
+
+        // Add pagination styles
+        const paginationStyle = document.createElement('style');
+        paginationStyle.textContent = `
+            .pagination {
+                display: flex;
+                justify-content: center;
+                gap: 5px;
+                margin-top: 40px;
+                flex-wrap: wrap;
+            }
+            
+            .pagination-btn {
+                width: 40px;
+                height: 40px;
+                border: 2px solid #ddd;
+                background: white;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: var(--transition);
+                font-weight: 500;
+            }
+            
+            .pagination-btn:hover:not(:disabled) {
+                border-color: var(--primary-red);
+                color: var(--primary-red);
+            }
+            
+            .pagination-btn.active {
+                background: var(--primary-red);
+                border-color: var(--primary-red);
+                color: white;
+            }
+            
+            .pagination-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+        `;
+        document.head.appendChild(paginationStyle);
+    </script>
+</body>
+</html>
