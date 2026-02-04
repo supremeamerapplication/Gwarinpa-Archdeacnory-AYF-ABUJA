@@ -1,0 +1,134 @@
+<!-- public/components/navbar.html -->
+<nav class="navbar">
+    <div class="container">
+        <div class="nav-brand">
+            <a href="/" class="logo-link">
+                <img src="../images/logo.png" alt="Gwarinpa Anglican Youth Fellowship" class="nav-logo">
+                <span class="nav-brand-text">Gwarinpa AYF</span>
+            </a>
+        </div>
+        
+        <button class="mobile-menu-btn" aria-label="Toggle menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <ul class="nav-links">
+            <li><a href="/" class="nav-link active">Home</a></li>
+            <li><a href="../pages/events.html" class="nav-link">Events</a></li>
+            <li><a href="../pages/yearly-plan.html" class="nav-link">Yearly Plan</a></li>
+            <li><a href="../pages/gallery.html" class="nav-link">Gallery</a></li>
+            <li><a href="../pages/announcements.html" class="nav-link">Announcements</a></li>
+            <li><a href="../pages/contact.html" class="nav-link">Contact</a></li>
+            <li><a href="../admin/login.html" class="nav-link admin-login">
+                <i class="fas fa-lock"></i> Admin
+            </a></li>
+        </ul>
+    </div>
+</nav>
+
+<style>
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: rgba(26, 26, 46, 0.95);
+        backdrop-filter: blur(10px);
+        z-index: 1000;
+        padding: 15px 0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .navbar .container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .nav-brand {
+        display: flex;
+        align-items: center;
+    }
+    
+    .logo-link {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: var(--text-light);
+    }
+    
+    .nav-logo {
+        width: 40px;
+        height: auto;
+        margin-right: 10px;
+    }
+    
+    .nav-brand-text {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--primary-gold);
+    }
+    
+    .mobile-menu-btn {
+        display: none;
+        background: none;
+        border: none;
+        color: var(--text-light);
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 5px;
+    }
+    
+    .nav-links {
+        display: flex;
+        list-style: none;
+        gap: 30px;
+        align-items: center;
+    }
+    
+    .nav-link {
+        color: var(--text-light);
+        text-decoration: none;
+        font-weight: 500;
+        padding: 8px 0;
+        position: relative;
+        transition: var(--transition);
+    }
+    
+    .nav-link:hover,
+    .nav-link.active {
+        color: var(--primary-gold);
+    }
+    
+    .nav-link::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--primary-gold);
+        transition: var(--transition);
+    }
+    
+    .nav-link:hover::after,
+    .nav-link.active::after {
+        width: 100%;
+    }
+    
+    .admin-login {
+        background: var(--primary-red);
+        padding: 8px 20px;
+        border-radius: 20px;
+        margin-left: 10px;
+    }
+    
+    .admin-login:hover {
+        background: var(--dark-red);
+        color: var(--text-light);
+    }
+    
+    .admin-login::after {
+        display: none;
+    }
+</style>
