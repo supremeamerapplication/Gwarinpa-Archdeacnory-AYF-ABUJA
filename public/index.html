@@ -1,0 +1,169 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gwarinpa Anglican Youth Fellowship - Rooted in Love</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="images/logo.png">
+</head>
+<body>
+    <!-- Navbar Component -->
+    <div id="navbar"></div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <img src="images/logo.png" alt="Gwarinpa Anglican Youth Fellowship Logo" class="logo">
+            <h1 class="hero-title">Rooted in Love</h1>
+            <p class="hero-subtitle">Gwarinpa Anglican Youth Fellowship</p>
+            <p class="hero-description">Building a vibrant community of young believers passionate about Christ, fellowship, and service.</p>
+            <div class="hero-buttons">
+                <a href="#upcoming-events" class="btn btn-primary">Upcoming Events</a>
+                <a href="pages/events.html" class="btn btn-secondary">View All Events</a>
+            </div>
+        </div>
+        <div class="hero-overlay"></div>
+    </section>
+
+    <!-- Featured Event Section -->
+    <section class="featured-event" id="featured-event">
+        <div class="container">
+            <h2 class="section-title">Featured Event</h2>
+            <div class="featured-card" id="featured-event-card">
+                <!-- Featured event will be loaded dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Upcoming Events Section -->
+    <section class="upcoming-events" id="upcoming-events">
+        <div class="container">
+            <h2 class="section-title">Upcoming Events</h2>
+            <div class="events-grid" id="events-grid">
+                <!-- Events will be loaded dynamically -->
+            </div>
+            <div class="text-center">
+                <a href="pages/events.html" class="btn btn-outline">View All Events</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Yearly Plan Preview -->
+    <section class="yearly-plan-preview">
+        <div class="container">
+            <h2 class="section-title">2025 Yearly Plan</h2>
+            <div class="plan-table-container">
+                <table class="plan-table">
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Theme</th>
+                            <th>Major Events</th>
+                            <th>Scripture Focus</th>
+                        </tr>
+                    </thead>
+                    <tbody id="plan-preview">
+                        <!-- Plan preview will be loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="download-buttons">
+                <a href="downloads/2025-plan.xlsx" class="btn btn-download" download>
+                    <i class="fas fa-file-excel"></i> Download Excel
+                </a>
+                <a href="downloads/2026-plan.pdf" class="btn btn-download" download>
+                    <i class="fas fa-file-pdf"></i> Download PDF
+                </a>
+                <a href="pages/yearly-plan.html" class="btn btn-primary">View Full Plan</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Preview -->
+    <section class="gallery-preview">
+        <div class="container">
+            <h2 class="section-title">Gallery Highlights</h2>
+            <div class="gallery-grid" id="gallery-preview">
+                <!-- Gallery preview will be loaded dynamically -->
+            </div>
+            <div class="text-center">
+                <a href="pages/gallery.html" class="btn btn-outline">View Gallery</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Announcements Preview -->
+    <section class="announcements-preview">
+        <div class="container">
+            <h2 class="section-title">Latest Announcements</h2>
+            <div class="announcements-grid" id="announcements-preview">
+                <!-- Announcements will be loaded dynamically -->
+            </div>
+            <div class="text-center">
+                <a href="pages/announcements.html" class="btn btn-primary">Read More</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Component -->
+    <div id="footer"></div>
+
+    <!-- Loader Component -->
+    <div id="loader" class="loader-overlay">
+        <div class="loader"></div>
+    </div>
+
+    <script src="js/supabaseClient.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/events.js"></script>
+    <script src="js/gallery.js"></script>
+    <script src="js/plans.js"></script>
+    <script src="js/announcements.js"></script>
+    <script>
+        // Load components
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load navbar
+            fetch('components/navbar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('navbar').innerHTML = data;
+                    // Initialize mobile menu after navbar loads
+                    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+                    const navLinks = document.querySelector('.nav-links');
+                    if (mobileMenuBtn) {
+                        mobileMenuBtn.addEventListener('click', () => {
+                            navLinks.classList.toggle('active');
+                        });
+                    }
+                });
+
+            // Load footer
+            fetch('components/footer.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('footer').innerHTML = data;
+                });
+
+            // Load featured event
+            loadFeaturedEvent();
+            
+            // Load upcoming events preview
+            loadUpcomingEvents(3);
+            
+            // Load yearly plan preview
+            loadYearlyPlanPreview();
+            
+            // Load gallery preview
+            loadGalleryPreview(4);
+            
+            // Load announcements preview
+            loadAnnouncementsPreview(3);
+        });
+    </script>
+</body>
+</html>
