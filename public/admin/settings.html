@@ -1,0 +1,689 @@
+<!-- public/admin/settings.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Admin Dashboard</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="admin-dashboard">
+    <nav class="admin-navbar">
+        <div class="container">
+            <div class="admin-brand">
+                <img src="../images/logo.png" alt="Logo">
+                <h1>Settings</h1>
+            </div>
+            
+            <div class="admin-menu">
+                <a href="../index.html" class="home-link">
+                    <i class="fas fa-home"></i> View Site
+                </a>
+                <a href="dashboard.html" class="dashboard-link">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <button class="logout-btn" onclick="logoutUser()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <aside class="admin-sidebar" id="sidebar">
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a></li>
+            <li><a href="manage-events.html">
+                <i class="fas fa-calendar-alt"></i> Manage Events
+            </a></li>
+            <li><a href="manage-gallery.html">
+                <i class="fas fa-images"></i> Manage Gallery
+            </a></li>
+            <li><a href="manage-plans.html">
+                <i class="fas fa-calendar-day"></i> Yearly Plans
+            </a></li>
+            <li><a href="manage-announcements.html">
+                <i class="fas fa-newspaper"></i> Announcements
+            </a></li>
+            <li><a href="manage-users.html">
+                <i class="fas fa-users-cog"></i> User Management
+            </a></li>
+            <li><a href="settings.html" class="active">
+                <i class="fas fa-cog"></i> Settings
+            </a></li>
+        </ul>
+    </aside>
+
+    <main class="admin-content">
+        <div class="dashboard-header">
+            <h2>System Settings</h2>
+        </div>
+
+        <!-- Settings Tabs -->
+        <div class="settings-tabs">
+            <button class="settings-tab active" data-tab="general">General</button>
+            <button class="settings-tab" data-tab="profile">Profile</button>
+            <button class="settings-tab" data-tab="security">Security</button>
+            <button class="settings-tab" data-tab="notifications">Notifications</button>
+            <button class="settings-tab" data-tab="backup">Backup</button>
+        </div>
+
+        <!-- General Settings -->
+        <div id="general-tab" class="settings-tab-content active">
+            <div class="admin-form">
+                <h3>General Settings</h3>
+                
+                <div class="form-group">
+                    <label>Site Title</label>
+                    <input type="text" id="site-title" value="Gwarinpa Anglican Youth Fellowship">
+                </div>
+
+                <div class="form-group">
+                    <label>Site Description</label>
+                    <textarea id="site-description" rows="3">Building a vibrant community of young believers passionate about Christ, fellowship, and service.</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Contact Email</label>
+                    <input type="email" id="contact-email" value="youth@gwarinpaanglican.org">
+                </div>
+
+                <div class="form-group">
+                    <label>Contact Phone</label>
+                    <input type="tel" id="contact-phone" value="+2348123456789">
+                </div>
+
+                <div class="form-group">
+                    <label>Church Address</label>
+                    <textarea id="church-address" rows="2">Gwarinpa Anglican Church, Gwarinpa Estate, Abuja, Nigeria</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Default Timezone</label>
+                    <select id="timezone">
+                        <option value="Africa/Lagos" selected>West Africa Time (WAT)</option>
+                        <option value="UTC">UTC</option>
+                        <!-- Add more timezones as needed -->
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn btn-primary" onclick="saveGeneralSettings()">
+                        <i class="fas fa-save"></i> Save Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Settings -->
+        <div id="profile-tab" class="settings-tab-content">
+            <div class="admin-form">
+                <h3>Profile Settings</h3>
+                
+                <div class="form-group">
+                    <label>Profile Picture</label>
+                    <div class="profile-picture-upload">
+                        <div class="profile-preview">
+                            <img id="profile-preview" src="https://ui-avatars.com/api/?name=Admin&background=E63946&color=fff&size=150" alt="Profile">
+                        </div>
+                        <button type="button" class="btn btn-outline" onclick="document.getElementById('profile-image').click()">
+                            <i class="fas fa-camera"></i> Change Photo
+                        </button>
+                        <input type="file" id="profile-image" accept="image/*" style="display: none;">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="profile-name" value="Administrator">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="profile-email" value="admin@example.com" disabled>
+                        <small>Email cannot be changed</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="profile-phone">
+                </div>
+
+                <div class="form-group">
+                    <label>Role</label>
+                    <input type="text" id="profile-role" value="Administrator" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label>Bio/Description</label>
+                    <textarea id="profile-bio" rows="4" placeholder="Tell us about yourself..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn btn-primary" onclick="saveProfileSettings()">
+                        <i class="fas fa-save"></i> Update Profile
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Settings -->
+        <div id="security-tab" class="settings-tab-content">
+            <div class="admin-form">
+                <h3>Security Settings</h3>
+                
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" id="current-password">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" id="new-password">
+                        <small>Minimum 8 characters</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm New Password</label>
+                        <input type="password" id="confirm-password">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="two-factor-auth">
+                        <span class="checkmark"></span>
+                        Enable Two-Factor Authentication
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>Session Timeout</label>
+                    <select id="session-timeout">
+                        <option value="15">15 minutes</option>
+                        <option value="30" selected>30 minutes</option>
+                        <option value="60">1 hour</option>
+                        <option value="120">2 hours</option>
+                        <option value="0">Never (not recommended)</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn btn-primary" onclick="saveSecuritySettings()">
+                        <i class="fas fa-save"></i> Update Security
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Sessions -->
+            <div class="admin-form" style="margin-top: 40px;">
+                <h3>Active Sessions</h3>
+                <div id="active-sessions">
+                    <!-- Sessions will be listed here -->
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-outline" onclick="logoutAllSessions()">
+                        <i class="fas fa-sign-out-alt"></i> Logout All Other Sessions
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Settings -->
+        <div id="notifications-tab" class="settings-tab-content">
+            <div class="admin-form">
+                <h3>Notification Preferences</h3>
+                
+                <div class="form-group">
+                    <h4>Email Notifications</h4>
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="notify-new-user" checked>
+                        <span class="checkmark"></span>
+                        New user registrations
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="notify-new-rsvp" checked>
+                        <span class="checkmark"></span>
+                        New event RSVPs
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="notify-contact-message" checked>
+                        <span class="checkmark"></span>
+                        New contact messages
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="notify-system-updates">
+                        <span class="checkmark"></span>
+                        System updates and maintenance
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <h4>Push Notifications</h4>
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="push-event-reminders" checked>
+                        <span class="checkmark"></span>
+                        Event reminders (24 hours before)
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="push-announcements" checked>
+                        <span class="checkmark"></span>
+                        New announcements
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="push-urgent">
+                        <span class="checkmark"></span>
+                        Urgent notifications
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <h4>Notification Frequency</h4>
+                    <select id="notification-frequency">
+                        <option value="immediate">Immediately</option>
+                        <option value="hourly" selected>Hourly digest</option>
+                        <option value="daily">Daily digest</option>
+                        <option value="weekly">Weekly digest</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn btn-primary" onclick="saveNotificationSettings()">
+                        <i class="fas fa-save"></i> Save Preferences
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Backup Settings -->
+        <div id="backup-tab" class="settings-tab-content">
+            <div class="admin-form">
+                <h3>Backup & Restore</h3>
+                
+                <div class="form-group">
+                    <h4>Automatic Backups</h4>
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="auto-backup" checked>
+                        <span class="checkmark"></span>
+                        Enable automatic backups
+                    </label>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Backup Frequency</label>
+                        <select id="backup-frequency">
+                            <option value="daily">Daily</option>
+                            <option value="weekly" selected>Weekly</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Keep Backups For</label>
+                        <select id="backup-retention">
+                            <option value="7">7 days</option>
+                            <option value="30" selected>30 days</option>
+                            <option value="90">90 days</option>
+                            <option value="365">1 year</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <h4>Manual Backup</h4>
+                    <p>Create a manual backup of all website data.</p>
+                    <button class="btn btn-primary" onclick="createBackup()">
+                        <i class="fas fa-download"></i> Create Backup Now
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <h4>Restore from Backup</h4>
+                    <div class="file-upload" onclick="document.getElementById('backup-file').click()">
+                        <i class="fas fa-upload"></i>
+                        <p>Click to select backup file</p>
+                        <input type="file" id="backup-file" accept=".json,.sql,.zip" style="display: none;">
+                    </div>
+                    <div class="form-actions" style="margin-top: 20px;">
+                        <button class="btn btn-outline" onclick="restoreBackup()">
+                            <i class="fas fa-upload"></i> Restore Backup
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <h4>Recent Backups</h4>
+                    <div id="backup-list">
+                        <!-- Backup list will be shown here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <script src="../js/supabaseClient.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const canAccess = await protectAdminRoute();
+            if (!canAccess) return;
+
+            initSettingsTabs();
+            initMobileMenu();
+            loadSettings();
+            loadActiveSessions();
+            loadBackupList();
+        });
+
+        function initSettingsTabs() {
+            const tabs = document.querySelectorAll('.settings-tab');
+            const tabContents = document.querySelectorAll('.settings-tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.dataset.tab;
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Show corresponding content
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === `${tabId}-tab`) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+        }
+
+        async function loadSettings() {
+            try {
+                const user = await getCurrentUser();
+                if (user) {
+                    document.getElementById('profile-email').value = user.email;
+                    document.getElementById('profile-name').value = user.user_metadata?.full_name || 'Administrator';
+                }
+
+                // Load saved settings from database
+                const { data: settings, error } = await supabase
+                    .from('settings')
+                    .select('*')
+                    .eq('key', 'general_settings')
+                    .single();
+
+                if (settings && !error) {
+                    const generalSettings = settings.value;
+                    document.getElementById('site-title').value = generalSettings.site_title || '';
+                    document.getElementById('site-description').value = generalSettings.site_description || '';
+                    // ... load other settings
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        async function saveGeneralSettings() {
+            const settings = {
+                site_title: document.getElementById('site-title').value,
+                site_description: document.getElementById('site-description').value,
+                contact_email: document.getElementById('contact-email').value,
+                contact_phone: document.getElementById('contact-phone').value,
+                church_address: document.getElementById('church-address').value,
+                timezone: document.getElementById('timezone').value
+            };
+
+            try {
+                const { error } = await supabase
+                    .from('settings')
+                    .upsert({
+                        key: 'general_settings',
+                        value: settings,
+                        updated_at: new Date().toISOString()
+                    });
+
+                if (error) throw error;
+                alert('General settings saved successfully!');
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                alert('Error saving settings. Please try again.');
+            }
+        }
+
+        async function saveProfileSettings() {
+            const name = document.getElementById('profile-name').value;
+            
+            try {
+                const { error } = await supabase.auth.updateUser({
+                    data: { full_name: name }
+                });
+
+                if (error) throw error;
+                alert('Profile updated successfully!');
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                alert('Error updating profile. Please try again.');
+            }
+        }
+
+        async function saveSecuritySettings() {
+            const currentPassword = document.getElementById('current-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            if (newPassword !== confirmPassword) {
+                alert('New passwords do not match!');
+                return;
+            }
+
+            if (newPassword.length < 8) {
+                alert('New password must be at least 8 characters long!');
+                return;
+            }
+
+            try {
+                const { error } = await supabase.auth.updateUser({
+                    password: newPassword
+                });
+
+                if (error) throw error;
+                
+                // Clear password fields
+                document.getElementById('current-password').value = '';
+                document.getElementById('new-password').value = '';
+                document.getElementById('confirm-password').value = '';
+                
+                alert('Password updated successfully!');
+            } catch (error) {
+                console.error('Error updating password:', error);
+                alert('Error updating password. Please check your current password.');
+            }
+        }
+
+        async function loadActiveSessions() {
+            try {
+                // This would typically come from your backend
+                const sessions = [
+                    { device: 'Chrome on Windows', location: 'Abuja, Nigeria', last_active: '2 minutes ago' },
+                    { device: 'Safari on iPhone', location: 'Lagos, Nigeria', last_active: '5 hours ago' }
+                ];
+
+                const container = document.getElementById('active-sessions');
+                container.innerHTML = sessions.map(session => `
+                    <div class="session-item" style="padding: 15px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>${session.device}</strong>
+                                <p style="margin: 5px 0; color: #666;">${session.location}</p>
+                                <small style="color: #999;">Last active: ${session.last_active}</small>
+                            </div>
+                            <button class="btn-delete-small" onclick="logoutSession(this)" style="background: var(--primary-red); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading sessions:', error);
+            }
+        }
+
+        function logoutSession(button) {
+            if (confirm('Are you sure you want to logout this session?')) {
+                button.closest('.session-item').remove();
+                alert('Session logged out successfully!');
+            }
+        }
+
+        function logoutAllSessions() {
+            if (confirm('Are you sure you want to logout all other sessions? You will remain logged in on this device.')) {
+                alert('All other sessions have been logged out!');
+            }
+        }
+
+        function saveNotificationSettings() {
+            const settings = {
+                email: {
+                    new_user: document.getElementById('notify-new-user').checked,
+                    new_rsvp: document.getElementById('notify-new-rsvp').checked,
+                    contact_message: document.getElementById('notify-contact-message').checked,
+                    system_updates: document.getElementById('notify-system-updates').checked
+                },
+                push: {
+                    event_reminders: document.getElementById('push-event-reminders').checked,
+                    announcements: document.getElementById('push-announcements').checked,
+                    urgent: document.getElementById('push-urgent').checked
+                },
+                frequency: document.getElementById('notification-frequency').value
+            };
+
+            // Save to database
+            alert('Notification preferences saved!');
+        }
+
+        function createBackup() {
+            if (confirm('This will create a backup of all website data. Continue?')) {
+                showLoader();
+                setTimeout(() => {
+                    alert('Backup created successfully! Download will start shortly.');
+                    hideLoader();
+                }, 2000);
+            }
+        }
+
+        function restoreBackup() {
+            const fileInput = document.getElementById('backup-file');
+            if (!fileInput.files.length) {
+                alert('Please select a backup file first.');
+                return;
+            }
+
+            if (confirm('WARNING: This will overwrite all current data with the backup. Continue?')) {
+                alert('Backup restoration started. This may take a few moments.');
+                // Implementation would go here
+            }
+        }
+
+        async function loadBackupList() {
+            try {
+                // Load backup list from storage
+                const container = document.getElementById('backup-list');
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #666;">
+                        <i class="fas fa-database" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>No backups found</p>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading backup list:', error);
+            }
+        }
+
+        function initMobileMenu() {
+            const toggleBtn = document.getElementById('mobile-menu-toggle');
+            const sidebar = document.getElementById('sidebar');
+            
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('active');
+                });
+            }
+        }
+
+        function showLoader() {
+            // Implement loader
+        }
+
+        function hideLoader() {
+            // Implement loader
+        }
+    </script>
+
+    <style>
+        .settings-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .settings-tab {
+            padding: 12px 25px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .settings-tab:hover {
+            background: #e9e9e9;
+        }
+
+        .settings-tab.active {
+            background: var(--primary-red);
+            color: white;
+        }
+
+        .settings-tab-content {
+            display: none;
+        }
+
+        .settings-tab-content.active {
+            display: block;
+        }
+
+        .profile-picture-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .profile-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid var(--primary-gold);
+        }
+
+        .profile-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</body>
+</html>
